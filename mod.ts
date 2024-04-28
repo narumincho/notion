@@ -1,4 +1,4 @@
-export async function* queryDatabase(parameter: {
+export const queryDatabase = async function* (parameter: {
   /**
    * https://www.notion.so/my-integrations で確認, 発行できる鍵
    * @example
@@ -21,7 +21,7 @@ export async function* queryDatabase(parameter: {
    *
    * @throws {Error} データベースが見つからない場合
    */
-  readonly databaseId: string;
+  readonly databaseId: NotionId;
 
   /**
    * 1回のHTTPリクエストで取得するページの最大数 (最大100)
@@ -53,10 +53,12 @@ export async function* queryDatabase(parameter: {
       },
     )).json();
     if (response.object !== "list") {
-      throw new Error(`Notion API error: ${response.code} ${response.message}`);
+      throw new Error(
+        `Notion API error: ${response.code} ${response.message}`,
+      );
     }
     for (const page of response.results) {
-      yield { id: page.id.replaceAll("-", "") };
+      yield { id: notionIdFromString(page.id) };
     }
     if (typeof response.next_cursor === "string") {
       cursor = response.next_cursor;
@@ -64,7 +66,7 @@ export async function* queryDatabase(parameter: {
       return;
     }
   }
-}
+};
 
 type QueryDatabaseRawResponse = {
   readonly object: "error";
@@ -96,13 +98,26 @@ type QueryDatabaseRawResponse = {
   readonly next_cursor: string | null;
 };
 
+export type NotionId = string & { readonly __brand: unique symbol };
+
+export const notionIdFromString = (id: string): NotionId => {
+  if (typeof id !== "string") {
+    throw new Error(`Invalid Notion ID: ${id}`);
+  }
+  const normalized = id.replaceAll("-", "");
+  if (!/^[0-9a-f]{32}$/u.test(normalized)) {
+    throw new Error(`Invalid Notion ID: ${id}`);
+  }
+  return normalized as NotionId;
+};
+
 export type Page = {
-  readonly id: string;
+  readonly id: NotionId;
 };
 
 /**
  * Notion の ID から URL を生成する. `-` が含まれると開けないため, 除去します
  */
-export const idToNotionUrl = (id: string): URL => {
-  return new URL(`https://notion.so/${id.replaceAll("", "-")}`);
+export const idToNotionUrl = (id: NotionId): URL => {
+  return new URL(`https://notion.so/${id}`);
 };
