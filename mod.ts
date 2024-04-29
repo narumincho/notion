@@ -58,7 +58,21 @@ export const queryDatabase = async function* (parameter: {
       );
     }
     for (const page of response.results) {
-      yield { id: notionIdFromString(page.id) };
+      console.log(page.properties);
+      yield {
+        id: notionIdFromString(page.id),
+        createdTime: new Date(page.created_time),
+        lastEditedIime: new Date(page.last_edited_time),
+        createdByUserId: notionUserIdFromString(page.created_by.id),
+        lastEditedByUserId: notionUserIdFromString(page.last_edited_by.id),
+        inTrash: page.in_trash,
+        properties: new Map(
+          Object.entries(page.properties).map(([key, value]) => [value.id, {
+            name: key,
+            value: rawPropertyValueToPropertyValue(value),
+          }]),
+        ),
+      };
     }
     if (typeof response.next_cursor === "string") {
       cursor = response.next_cursor;
@@ -88,17 +102,225 @@ type QueryDatabaseRawResponse = {
       readonly id: string;
     };
     readonly in_trash: boolean;
-    readonly properties: Record<string, {
-      readonly id: string;
-      readonly type: string;
-    }>;
+    readonly properties: Record<
+      string,
+      RawPropertyValue
+    >;
+
     readonly url: string;
     readonly public_url: string | null;
   }>;
   readonly next_cursor: string | null;
 };
 
+type RawPropertyValue =
+  | {
+    readonly type: "number";
+    readonly number: number | null;
+    readonly id: string;
+  }
+  | {
+    readonly type: "url";
+    readonly url: string | null;
+    readonly id: string;
+  }
+  | {
+    readonly type: "select";
+    readonly select: PartialSelectResponse | null;
+    readonly id: string;
+  }
+  | {
+    readonly type: "multi_select";
+    readonly multi_select: Array<PartialSelectResponse>;
+    readonly id: string;
+  }
+  | {
+    readonly type: "status";
+    readonly status: PartialSelectResponse | null;
+    readonly id: string;
+  }
+  | {
+    readonly type: "date";
+    readonly date: DateResponse | null;
+    readonly id: string;
+  }
+  | {
+    readonly type: "email";
+    readonly email: string | null;
+    readonly id: string;
+  }
+  | {
+    readonly type: "phone_number";
+    readonly phone_number: string | null;
+    readonly id: string;
+  }
+  | {
+    readonly type: "checkbox";
+    readonly checkbox: boolean;
+    readonly id: string;
+  }; // | {
+//   type: "files";
+//   files: Array<
+//     | {
+//       file: { url: string; expiry_time: string };
+//       name: StringRequest;
+//       type?: "file";
+//     }
+//     | {
+//       external: { url: TextRequest };
+//       name: StringRequest;
+//       type?: "external";
+//     }
+//   >;
+//   id: string;
+// }
+// | {
+//   type: "created_by";
+//   created_by: PartialUserObjectResponse | UserObjectResponse;
+//   id: string;
+// }
+// | { type: "created_time"; created_time: string; id: string }
+// | {
+//   type: "last_edited_by";
+//   last_edited_by: PartialUserObjectResponse | UserObjectResponse;
+//   id: string;
+// }
+// | { type: "last_edited_time"; last_edited_time: string; id: string }
+// | { type: "formula"; formula: FormulaPropertyResponse; id: string }
+// | { type: "button"; button: Record<string, never>; id: string }
+// | {
+//   type: "unique_id";
+//   unique_id: { prefix: string | null; number: number | null };
+//   id: string;
+// }
+// | {
+//   type: "verification";
+//   verification:
+//     | VerificationPropertyUnverifiedResponse
+//     | null
+//     | VerificationPropertyResponse
+//     | null;
+//   id: string;
+// }
+// | { type: "title"; title: Array<RichTextItemResponse>; id: string }
+// | {
+//   type: "rich_text";
+//   rich_text: Array<RichTextItemResponse>;
+//   id: string;
+// }
+// | {
+//   type: "people";
+//   people: Array<PartialUserObjectResponse | UserObjectResponse>;
+//   id: string;
+// }
+// | { type: "relation"; relation: Array<{ id: string }>; id: string }
+// | {
+//   type: "rollup";
+//   rollup:
+//     | { type: "number"; number: number | null; function: RollupFunction }
+//     | {
+//       type: "date";
+//       date: DateResponse | null;
+//       function: RollupFunction;
+//     }
+//     | {
+//       type: "array";
+//       array: Array<
+//         | { type: "number"; number: number | null }
+//         | { type: "url"; url: string | null }
+//         | { type: "select"; select: PartialSelectResponse | null }
+//         | {
+//           type: "multi_select";
+//           multi_select: Array<PartialSelectResponse>;
+//         }
+//         | { type: "status"; status: PartialSelectResponse | null }
+//         | { type: "date"; date: DateResponse | null }
+//         | { type: "email"; email: string | null }
+//         | { type: "phone_number"; phone_number: string | null }
+//         | { type: "checkbox"; checkbox: boolean }
+//         | {
+//           type: "files";
+//           files: Array<
+//             | {
+//               file: { url: string; expiry_time: string };
+//               name: StringRequest;
+//               type?: "file";
+//             }
+//             | {
+//               external: { url: TextRequest };
+//               name: StringRequest;
+//               type?: "external";
+//             }
+//           >;
+//         }
+//         | {
+//           type: "created_by";
+//           created_by: PartialUserObjectResponse | UserObjectResponse;
+//         }
+//         | { type: "created_time"; created_time: string }
+//         | {
+//           type: "last_edited_by";
+//           last_edited_by:
+//             | PartialUserObjectResponse
+//             | UserObjectResponse;
+//         }
+//         | { type: "last_edited_time"; last_edited_time: string }
+//         | { type: "formula"; formula: FormulaPropertyResponse }
+//         | { type: "button"; button: Record<string, never> }
+//         | {
+//           type: "unique_id";
+//           unique_id: { prefix: string | null; number: number | null };
+//         }
+//         | {
+//           type: "verification";
+//           verification:
+//             | VerificationPropertyUnverifiedResponse
+//             | null
+//             | VerificationPropertyResponse
+//             | null;
+//         }
+//         | { type: "title"; title: Array<RichTextItemResponse> }
+//         | { type: "rich_text"; rich_text: Array<RichTextItemResponse> }
+//         | {
+//           type: "people";
+//           people: Array<
+//             PartialUserObjectResponse | UserObjectResponse
+//           >;
+//         }
+//         | { type: "relation"; relation: Array<{ id: string }> }
+//       >;
+//       function: RollupFunction;
+//     };
+//   id: string;
+// }
+
+type PartialSelectResponse = {
+  readonly id: string;
+  readonly color: SelectColor;
+  readonly name: string;
+};
+
+export type SelectColor =
+  | "default"
+  | "gray"
+  | "brown"
+  | "orange"
+  | "yellow"
+  | "green"
+  | "blue"
+  | "purple"
+  | "pink"
+  | "red";
+
+export type DateResponse = {
+  readonly start: string;
+  readonly end: string | null;
+  // time_zone: TimeZoneRequest | null;
+};
+
 export type NotionId = string & { readonly __brand: unique symbol };
+
+export type NotionUserId = string & { readonly __brand: unique symbol };
 
 export const notionIdFromString = (id: string): NotionId => {
   if (typeof id !== "string") {
@@ -111,8 +333,48 @@ export const notionIdFromString = (id: string): NotionId => {
   return normalized as NotionId;
 };
 
+export const notionUserIdFromString = (id: string): NotionUserId => {
+  if (typeof id !== "string") {
+    throw new Error(`Invalid NotionUserId ID: ${id}`);
+  }
+  const normalized = id.replaceAll("-", "");
+  if (!/^[0-9a-f]{32}$/u.test(normalized)) {
+    throw new Error(`Invalid NotionUserId ID: ${id}`);
+  }
+  return normalized as NotionUserId;
+};
+
 export type Page = {
   readonly id: NotionId;
+  readonly createdTime: Date;
+  readonly lastEditedIime: Date;
+  readonly createdByUserId: NotionUserId;
+  readonly lastEditedByUserId: NotionUserId;
+  readonly inTrash: boolean;
+  readonly properties: ReadonlyMap<string, {
+    readonly name: string;
+    readonly value: PropertyValue;
+  }>;
+};
+
+export type PropertyValue =
+  | { readonly type: "number"; readonly number: number | null }
+  | { readonly type: "url"; readonly url: URL | null }
+  | { readonly type: "unsupported" };
+
+const rawPropertyValueToPropertyValue = (
+  raw: RawPropertyValue,
+): PropertyValue => {
+  switch (raw.type) {
+    case "number":
+      return { type: "number", number: raw.number };
+    case "url":
+      return raw.url === null
+        ? { type: "url", url: null }
+        : { type: "url", url: new URL(raw.url) };
+    default:
+      return { type: "unsupported" };
+  }
 };
 
 /**
