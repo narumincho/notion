@@ -1,4 +1,4 @@
-export const queryDatabase = async function* (parameter: {
+export const queryDatabase = (parameter: {
   /**
    * https://www.notion.so/my-integrations で確認, 発行できる鍵
    * @example
@@ -30,43 +30,56 @@ export const queryDatabase = async function* (parameter: {
    * @default 100
    */
   readonly pageSize?: number | undefined;
-}): AsyncGenerator<Page, void, unknown> {
-  let cursor: string | undefined = undefined;
-  while (true) {
-    const response: QueryDatabaseRawResponse = await (await fetch(
-      `https://api.notion.com/v1/databases/${
-        parameter.databaseId.replaceAll("-", "")
-      }/query`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${parameter.apiKey}`,
-          "Notion-Version": "2022-06-28",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...(typeof cursor === "string" ? { start_cursor: cursor } : {}),
-          ...(typeof parameter.pageSize === "number"
-            ? { page_size: parameter.pageSize }
-            : {}),
-        }),
-      },
-    )).json();
-    if (response.object !== "list") {
-      throw new Error(
-        `Notion API error: ${response.code} ${response.message}`,
-      );
-    }
-    for (const page of response.results) {
-      yield { id: notionIdFromString(page.id) };
-    }
-    if (typeof response.next_cursor === "string") {
-      cursor = response.next_cursor;
-    } else {
-      return;
-    }
-  }
-};
+}): ReadableStream<Page> =>
+  new ReadableStream<Page>({
+    cancel: () => {
+    },
+    start: async (controller) => {
+      console.log("start");
+      let cursor: string | undefined = undefined;
+      while (true) {
+        console.log("fetch");
+        const response: QueryDatabaseRawResponse = await (await fetch(
+          `https://api.notion.com/v1/databases/${
+            parameter.databaseId.replaceAll("-", "")
+          }/query`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${parameter.apiKey}`,
+              "Notion-Version": "2022-06-28",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              ...(typeof cursor === "string" ? { start_cursor: cursor } : {}),
+              ...(typeof parameter.pageSize === "number"
+                ? { page_size: parameter.pageSize }
+                : {}),
+            }),
+          },
+        )).json();
+        console.log("response", response);
+        if (response.object !== "list") {
+          controller.close();
+          throw new Error(
+            `Notion API error: ${response.code} ${response.message}`,
+          );
+        }
+        for (const page of response.results) {
+          controller.enqueue({ id: notionIdFromString(page.id) });
+        }
+        if (typeof response.next_cursor === "string") {
+          cursor = response.next_cursor;
+        } else {
+          controller.close();
+          return;
+        }
+      }
+    },
+    pull: (controller) => {
+      console.log("pull", controller);
+    },
+  });
 
 type QueryDatabaseRawResponse = {
   readonly object: "error";

@@ -4,6 +4,6 @@
     "exactOptionalPropertyTypes": true
   },
   "tasks": {
-    "test": "deno test --allow-net=api.notion.com"
+    "test": "deno test --allow-net=api.notion.com --trace-leaks"
   }
 }

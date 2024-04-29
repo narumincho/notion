@@ -8,14 +8,14 @@ Deno.test("queryDatabase one", async () => {
   const firstPage = await queryDatabase({
     apiKey,
     databaseId: notionIdFromString("a1cb2e5ca6f94399a835fdcd39a828cb"),
-  }).next();
+  }).values().next();
   assertEquals(firstPage.value, {
     id: notionIdFromString("e3389b1b7e7841c9835155b8f4757dbe"),
   });
 });
 
-Deno.test("queryDatabase not found", () => {
-  assertRejects(
+Deno.test("queryDatabase not found", async () => {
+  await assertRejects(
     async () => {
       for await (
         const page of queryDatabase({
