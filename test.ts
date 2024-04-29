@@ -14,8 +14,8 @@ Deno.test("queryDatabase one", async () => {
   });
 });
 
-Deno.test("queryDatabase not found", () => {
-  assertRejects(
+Deno.test("queryDatabase not found", async () => {
+  await assertRejects(
     async () => {
       for await (
         const page of queryDatabase({
