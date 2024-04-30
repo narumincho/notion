@@ -1,3 +1,14 @@
+import {
+  PageId,
+  pageIdFromString,
+  SelectId,
+  selectIdFromString,
+  UserId,
+  userIdFromString,
+} from "./id.ts";
+
+export * from "./id.ts";
+
 export const queryDatabase = async function* (parameter: {
   /**
    * https://www.notion.so/my-integrations で確認, 発行できる鍵
@@ -21,7 +32,7 @@ export const queryDatabase = async function* (parameter: {
    *
    * @throws {Error} データベースが見つからない場合
    */
-  readonly databaseId: NotionId;
+  readonly databaseId: PageId;
 
   /**
    * 1回のHTTPリクエストで取得するページの最大数 (最大100)
@@ -60,11 +71,11 @@ export const queryDatabase = async function* (parameter: {
     for (const page of response.results) {
       console.log(page.properties);
       yield {
-        id: notionIdFromString(page.id),
+        id: pageIdFromString(page.id),
         createdTime: new Date(page.created_time),
         lastEditedIime: new Date(page.last_edited_time),
-        createdByUserId: notionUserIdFromString(page.created_by.id),
-        lastEditedByUserId: notionUserIdFromString(page.last_edited_by.id),
+        createdByUserId: userIdFromString(page.created_by.id),
+        lastEditedByUserId: userIdFromString(page.last_edited_by.id),
         inTrash: page.in_trash,
         properties: new Map(
           Object.entries(page.properties).map(([key, value]) => [value.id, {
@@ -318,38 +329,12 @@ export type DateResponse = {
   // time_zone: TimeZoneRequest | null;
 };
 
-export type NotionId = string & { readonly __brand: unique symbol };
-
-export type NotionUserId = string & { readonly __brand: unique symbol };
-
-export const notionIdFromString = (id: string): NotionId => {
-  if (typeof id !== "string") {
-    throw new Error(`Invalid Notion ID: ${id}`);
-  }
-  const normalized = id.replaceAll("-", "");
-  if (!/^[0-9a-f]{32}$/u.test(normalized)) {
-    throw new Error(`Invalid Notion ID: ${id}`);
-  }
-  return normalized as NotionId;
-};
-
-export const notionUserIdFromString = (id: string): NotionUserId => {
-  if (typeof id !== "string") {
-    throw new Error(`Invalid NotionUserId ID: ${id}`);
-  }
-  const normalized = id.replaceAll("-", "");
-  if (!/^[0-9a-f]{32}$/u.test(normalized)) {
-    throw new Error(`Invalid NotionUserId ID: ${id}`);
-  }
-  return normalized as NotionUserId;
-};
-
 export type Page = {
-  readonly id: NotionId;
+  readonly id: PageId;
   readonly createdTime: Date;
   readonly lastEditedIime: Date;
-  readonly createdByUserId: NotionUserId;
-  readonly lastEditedByUserId: NotionUserId;
+  readonly createdByUserId: UserId;
+  readonly lastEditedByUserId: UserId;
   readonly inTrash: boolean;
   readonly properties: ReadonlyMap<string, {
     readonly name: string;
@@ -358,20 +343,52 @@ export type Page = {
 };
 
 export type PropertyValue =
-  | { readonly type: "number"; readonly number: number | null }
-  | { readonly type: "url"; readonly url: URL | null }
+  | { readonly type: "number"; readonly number: number | undefined }
+  | { readonly type: "url"; readonly url: URL | undefined }
+  | {
+    readonly type: "select";
+    readonly select: SelectResponse | undefined;
+  }
+  | {
+    readonly type: "multi_select";
+    readonly multi_select: Array<SelectResponse>;
+  }
   | { readonly type: "unsupported" };
+
+export type SelectResponse = {
+  readonly id: SelectId;
+  readonly name: string;
+  readonly color: SelectColor;
+};
 
 const rawPropertyValueToPropertyValue = (
   raw: RawPropertyValue,
 ): PropertyValue => {
   switch (raw.type) {
     case "number":
-      return { type: "number", number: raw.number };
+      return { type: "number", number: raw.number ?? undefined };
     case "url":
       return raw.url === null
-        ? { type: "url", url: null }
+        ? { type: "url", url: undefined }
         : { type: "url", url: new URL(raw.url) };
+    case "select":
+      return {
+        type: "select",
+        select: raw.select === null ? undefined : {
+          id: selectIdFromString(raw.select.id),
+          name: raw.select.name,
+          color: raw.select.color,
+        },
+      };
+    case "multi_select":
+      return {
+        type: "multi_select",
+        multi_select: raw.multi_select.map((select) => ({
+          id: selectIdFromString(select.id),
+          name: select.name,
+          color: select.color,
+        })),
+      };
     default:
       return { type: "unsupported" };
   }
@@ -380,6 +397,6 @@ const rawPropertyValueToPropertyValue = (
 /**
  * Notion の ID から URL を生成する. `-` が含まれると開けないため, 除去します
  */
-export const idToNotionUrl = (id: NotionId): URL => {
+export const idToNotionUrl = (id: PageId): URL => {
   return new URL(`https://notion.so/${id}`);
 };
