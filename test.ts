@@ -1,5 +1,7 @@
 import {
   pageIdFromString,
+  PropertyId,
+  propertyIdFromString,
   PropertyValue,
   queryDatabase,
   selectIdFromString,
@@ -33,12 +35,12 @@ Deno.test("queryDatabase one", async () => {
   assertEquals(firstPage.value.inTrash, false);
   assertEquals(
     firstPage.value.properties,
-    new Map<string, {
+    new Map<PropertyId, {
       readonly name: string;
       readonly value: PropertyValue;
     }>([
       [
-        "title",
+        propertyIdFromString("title"),
         {
           name: "名前",
           value: {
@@ -47,7 +49,7 @@ Deno.test("queryDatabase one", async () => {
         },
       ],
       [
-        "ycLe",
+        propertyIdFromString("ycLe"),
         {
           name: "タグ",
           value: {
@@ -63,7 +65,7 @@ Deno.test("queryDatabase one", async () => {
         },
       ],
       [
-        "BjF%5D",
+        propertyIdFromString("BjF%5D"),
         {
           name: "日付",
           value: {

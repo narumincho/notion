@@ -1,6 +1,8 @@
 import {
   PageId,
   pageIdFromString,
+  PropertyId,
+  propertyIdFromString,
   SelectId,
   selectIdFromString,
   UserId,
@@ -78,7 +80,9 @@ export const queryDatabase = async function* (parameter: {
         lastEditedByUserId: userIdFromString(page.last_edited_by.id),
         inTrash: page.in_trash,
         properties: new Map(
-          Object.entries(page.properties).map(([key, value]) => [value.id, {
+          Object.entries(page.properties).map((
+            [key, value],
+          ) => [propertyIdFromString(value.id), {
             name: key,
             value: rawPropertyValueToPropertyValue(value),
           }]),
@@ -336,7 +340,7 @@ export type Page = {
   readonly createdByUserId: UserId;
   readonly lastEditedByUserId: UserId;
   readonly inTrash: boolean;
-  readonly properties: ReadonlyMap<string, {
+  readonly properties: ReadonlyMap<PropertyId, {
     readonly name: string;
     readonly value: PropertyValue;
   }>;

@@ -56,3 +56,18 @@ export type SelectId = string & { readonly __brand: unique symbol };
 export const selectIdFromString = (id: string): SelectId => {
   return normalizeOrThrowUuid<SelectId>(id, "SelectId");
 };
+
+/**
+ * データベースのプロパティのID
+ */
+export type PropertyId = string & { readonly __brand: unique symbol };
+
+/**
+ * データベースのプロパティのセレクトの選択肢のIDを文字列から作成する
+ */
+export const propertyIdFromString = (id: string): PropertyId => {
+  if (typeof id !== "string") {
+    throw new Error(`Invalid PropertyId expected string: ${id}`);
+  }
+  return id as PropertyId;
+};
