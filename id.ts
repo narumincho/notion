@@ -13,7 +13,7 @@ const normalizeOrThrowUuid = <T extends string>(
 };
 
 /**
- * ページID
+ * ページID. 作成時に`-`が除去されている
  *
  * {@link pageIdFromString} で作成できる
  */
@@ -28,7 +28,7 @@ export const pageIdFromString = (id: string): PageId => {
 };
 
 /**
- * ユーザーID
+ * ユーザーID. 作成時に`-`が除去されている
  *
  * {@link userIdFromString} で作成できる
  */
@@ -43,7 +43,7 @@ export const userIdFromString = (id: string): UserId => {
 };
 
 /**
- * データベースのプロパティのセレクトの選択肢のID
+ * データベースのプロパティのセレクトの選択肢のID. 作成時に`-`が除去されている
  *
  * {@link selectIdFromString} で作成できる
  */

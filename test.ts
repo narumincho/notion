@@ -1,8 +1,8 @@
 import {
   pageIdFromString,
-  PropertyId,
+  type PropertyId,
   propertyIdFromString,
-  PropertyValue,
+  type PropertyValue,
   queryDatabase,
   selectIdFromString,
   userIdFromString,
@@ -53,14 +53,15 @@ Deno.test("queryDatabase one", async () => {
         {
           name: "タグ",
           value: {
-            type: "multi_select",
-            multi_select: [
+            type: "select",
+            select: [
               {
                 id: selectIdFromString("392f963c2cc44009a24121b704c04042"),
                 name: "A",
                 color: "green",
               },
             ],
+            selectType: "multi_select",
           },
         },
       ],
@@ -70,6 +71,23 @@ Deno.test("queryDatabase one", async () => {
           name: "日付",
           value: {
             type: "unsupported",
+          },
+        },
+      ],
+      [
+        propertyIdFromString("ZX%3CB"),
+        {
+          name: "ステータス",
+          value: {
+            type: "select",
+            select: [
+              {
+                id: selectIdFromString("adde31eb4432411d846c43059dad2f58"),
+                name: "未着手",
+                color: "default",
+              },
+            ],
+            selectType: "status",
           },
         },
       ],

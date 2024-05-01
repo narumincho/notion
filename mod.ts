@@ -1,11 +1,11 @@
 import {
-  PageId,
+  type PageId,
   pageIdFromString,
-  PropertyId,
+  type PropertyId,
   propertyIdFromString,
-  SelectId,
+  type SelectId,
   selectIdFromString,
-  UserId,
+  type UserId,
   userIdFromString,
 } from "./id.ts";
 
@@ -351,11 +351,8 @@ export type PropertyValue =
   | { readonly type: "url"; readonly url: URL | undefined }
   | {
     readonly type: "select";
-    readonly select: SelectResponse | undefined;
-  }
-  | {
-    readonly type: "multi_select";
-    readonly multi_select: Array<SelectResponse>;
+    readonly select: Array<SelectResponse>;
+    readonly selectType: "select" | "multi_select" | "status";
   }
   | { readonly type: "unsupported" };
 
@@ -378,20 +375,32 @@ const rawPropertyValueToPropertyValue = (
     case "select":
       return {
         type: "select",
-        select: raw.select === null ? undefined : {
+        select: raw.select === null ? [] : [{
           id: selectIdFromString(raw.select.id),
           name: raw.select.name,
           color: raw.select.color,
-        },
+        }],
+        selectType: "select",
       };
     case "multi_select":
       return {
-        type: "multi_select",
-        multi_select: raw.multi_select.map((select) => ({
+        type: "select",
+        select: raw.multi_select.map((select) => ({
           id: selectIdFromString(select.id),
           name: select.name,
           color: select.color,
         })),
+        selectType: "multi_select",
+      };
+    case "status":
+      return {
+        type: "select",
+        select: raw.status === null ? [] : [{
+          id: selectIdFromString(raw.status.id),
+          name: raw.status.name,
+          color: raw.status.color,
+        }],
+        selectType: "status",
       };
     default:
       return { type: "unsupported" };
@@ -399,7 +408,7 @@ const rawPropertyValueToPropertyValue = (
 };
 
 /**
- * Notion の ID から URL を生成する. `-` が含まれると開けないため, 除去します
+ * Notion の ID から URL を生成する
  */
 export const idToNotionUrl = (id: PageId): URL => {
   return new URL(`https://notion.so/${id}`);
