@@ -70,7 +70,11 @@ Deno.test("queryDatabase one", async () => {
         {
           name: "日付",
           value: {
-            type: "unsupported",
+            type: "date",
+            date: {
+              start: new Date("2024-04-29T03:00:00.000Z"),
+              end: undefined,
+            },
           },
         },
       ],

@@ -11,6 +11,10 @@ import {
 
 export * from "./id.ts";
 
+/**
+ * データベースから指定した条件を満たすページを複数取得する
+ * @see https://developers.notion.com/reference/post-database-query
+ */
 export const queryDatabase = async function* (parameter: {
   /**
    * https://www.notion.so/my-integrations で確認, 発行できる鍵
@@ -330,7 +334,10 @@ export type SelectColor =
 export type DateResponse = {
   readonly start: string;
   readonly end: string | null;
-  // time_zone: TimeZoneRequest | null;
+  /**
+   * always null
+   */
+  readonly time_zone: null;
 };
 
 export type Page = {
@@ -347,12 +354,39 @@ export type Page = {
 };
 
 export type PropertyValue =
-  | { readonly type: "number"; readonly number: number | undefined }
-  | { readonly type: "url"; readonly url: URL | undefined }
   | {
+    /**
+     * https://developers.notion.com/reference/page-property-values#number
+     */
+    readonly type: "number";
+    readonly number: number | undefined;
+  }
+  | {
+    /**
+     * https://developers.notion.com/reference/page-property-values#url
+     */
+    readonly type: "url";
+    readonly url: URL | undefined;
+  }
+  | {
+    /**
+     * - select https://developers.notion.com/reference/page-property-values#select
+     * - multi_select https://developers.notion.com/reference/page-property-values#multi-select
+     * - status https://developers.notion.com/reference/page-property-values#status
+     */
     readonly type: "select";
     readonly select: Array<SelectResponse>;
     readonly selectType: "select" | "multi_select" | "status";
+  }
+  | {
+    /**
+     * https://developers.notion.com/reference/page-property-values#date
+     */
+    readonly type: "date";
+    readonly date: {
+      readonly start: Date;
+      readonly end: Date | undefined;
+    } | undefined;
   }
   | { readonly type: "unsupported" };
 
@@ -402,6 +436,17 @@ const rawPropertyValueToPropertyValue = (
         }],
         selectType: "status",
       };
+    case "date":
+      return {
+        type: "date",
+        date: raw.date === null ? undefined : {
+          start: new Date(raw.date.start),
+          end: raw.date.end === null ? undefined : new Date(raw.date.end),
+        },
+      };
+    case "email":
+    case "phone_number":
+    case "checkbox":
     default:
       return { type: "unsupported" };
   }
