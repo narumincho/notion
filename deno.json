@@ -1,9 +1,12 @@
 {
+  "name": "@narumincho/notion",
+  "version": "0.0.1",
   "compilerOptions": {
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true
   },
   "tasks": {
     "test": "deno test --allow-net=api.notion.com"
-  }
+  },
+  "exports": "./mod.ts"
 }
