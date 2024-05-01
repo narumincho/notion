@@ -1,14 +1,14 @@
 import {
   type DatabaseId,
-  databaseIdFromString,
+  databaseIdFrom,
   type PageId,
-  pageIdFromString,
+  pageIdFrom,
   type PropertyId,
-  propertyIdFromString,
+  propertyIdFrom,
   type SelectId,
-  selectIdFromString,
+  selectIdFrom,
   type UserId,
-  userIdFromString,
+  userIdFrom,
 } from "./id.ts";
 
 /**
@@ -38,7 +38,7 @@ export const queryDatabase = async function* (parameter: {
    *
    * @throws {Error} データベースが見つからない場合
    */
-  readonly databaseId: PageId;
+  readonly databaseId: DatabaseId;
 
   /**
    * 1回のHTTPリクエストで取得するページの最大数 (最大100)
@@ -76,16 +76,16 @@ export const queryDatabase = async function* (parameter: {
     }
     for (const page of response.results) {
       yield {
-        id: pageIdFromString(page.id),
+        id: pageIdFrom(page.id),
         createdTime: new Date(page.created_time),
         lastEditedTime: new Date(page.last_edited_time),
-        createdByUserId: userIdFromString(page.created_by.id),
-        lastEditedByUserId: userIdFromString(page.last_edited_by.id),
+        createdByUserId: userIdFrom(page.created_by.id),
+        lastEditedByUserId: userIdFrom(page.last_edited_by.id),
         inTrash: page.in_trash,
         properties: new Map(
           Object.entries(page.properties).map((
             [key, value],
-          ) => [propertyIdFromString(value.id), {
+          ) => [propertyIdFrom(value.id), {
             name: key,
             value: rawPropertyValueToPropertyValue(value),
           }]),
@@ -599,7 +599,7 @@ const rawPropertyValueToPropertyValue = (
       return {
         type: "select",
         select: raw.select === null ? [] : [{
-          id: selectIdFromString(raw.select.id),
+          id: selectIdFrom(raw.select.id),
           name: raw.select.name,
           color: raw.select.color,
         }],
@@ -609,7 +609,7 @@ const rawPropertyValueToPropertyValue = (
       return {
         type: "select",
         select: raw.multi_select.map((select) => ({
-          id: selectIdFromString(select.id),
+          id: selectIdFrom(select.id),
           name: select.name,
           color: select.color,
         })),
@@ -619,7 +619,7 @@ const rawPropertyValueToPropertyValue = (
       return {
         type: "select",
         select: raw.status === null ? [] : [{
-          id: selectIdFromString(raw.status.id),
+          id: selectIdFrom(raw.status.id),
           name: raw.status.name,
           color: raw.status.color,
         }],
@@ -700,7 +700,7 @@ const mentionRichTextItemResponseFromRaw = (
 ): MentionRichTextItemResponse["mention"] => {
   switch (raw.type) {
     case "user":
-      return { type: "user", userId: userIdFromString(raw.user.id) };
+      return { type: "user", userId: userIdFrom(raw.user.id) };
     case "date":
       return { type: "date", date: raw.date };
     case "link_preview":
@@ -714,11 +714,11 @@ const mentionRichTextItemResponseFromRaw = (
         templateMention: raw.template_mention,
       };
     case "page":
-      return { type: "page", pageId: pageIdFromString(raw.page.id) };
+      return { type: "page", pageId: pageIdFrom(raw.page.id) };
     case "database":
       return {
         type: "database",
-        databaseId: databaseIdFromString(raw.database.id),
+        databaseId: databaseIdFrom(raw.database.id),
       };
   }
 };

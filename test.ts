@@ -1,32 +1,33 @@
 import {
-  pageIdFromString,
+  pageIdFrom,
   type PropertyId,
-  propertyIdFromString,
+  propertyIdFrom,
   type PropertyValue,
   queryDatabase,
-  selectIdFromString,
-  userIdFromString,
+  selectIdFrom,
+  userIdFrom,
 } from "./mod.ts";
 import { assertEquals, assertRejects } from "jsr:@std/assert";
 import secret from "./secret.json" with { type: "json" };
+import { databaseIdFrom } from "./id.ts";
 
 const { apiKey } = secret;
 
 Deno.test("queryDatabase one", async () => {
   const firstPage = await queryDatabase({
     apiKey,
-    databaseId: pageIdFromString("a1cb2e5ca6f94399a835fdcd39a828cb"),
+    databaseId: databaseIdFrom("a1cb2e5ca6f94399a835fdcd39a828cb"),
   }).next();
   if (firstPage.done) {
     throw new Error("No page found");
   }
   assertEquals(
     firstPage.value.id,
-    pageIdFromString("e3389b1b7e7841c9835155b8f4757dbe"),
+    pageIdFrom("e3389b1b7e7841c9835155b8f4757dbe"),
   );
   assertEquals(
     firstPage.value.createdByUserId,
-    userIdFromString("b98a5d4e7d88422b8e58dcf58d45b7f0"),
+    userIdFrom("b98a5d4e7d88422b8e58dcf58d45b7f0"),
   );
   assertEquals(
     firstPage.value.createdTime,
@@ -40,7 +41,7 @@ Deno.test("queryDatabase one", async () => {
       readonly value: PropertyValue;
     }>([
       [
-        propertyIdFromString("title"),
+        propertyIdFrom("title"),
         {
           name: "名前",
           value: {
@@ -75,7 +76,7 @@ Deno.test("queryDatabase one", async () => {
                   type: "mention",
                   mention: {
                     type: "user",
-                    userId: userIdFromString(
+                    userId: userIdFrom(
                       "b98a5d4e7d88422b8e58dcf58d45b7f0",
                     ),
                   },
@@ -88,14 +89,14 @@ Deno.test("queryDatabase one", async () => {
         },
       ],
       [
-        propertyIdFromString("ycLe"),
+        propertyIdFrom("ycLe"),
         {
           name: "タグ",
           value: {
             type: "select",
             select: [
               {
-                id: selectIdFromString("392f963c2cc44009a24121b704c04042"),
+                id: selectIdFrom("392f963c2cc44009a24121b704c04042"),
                 name: "A",
                 color: "green",
               },
@@ -105,7 +106,7 @@ Deno.test("queryDatabase one", async () => {
         },
       ],
       [
-        propertyIdFromString("BjF%5D"),
+        propertyIdFrom("BjF%5D"),
         {
           name: "日付",
           value: {
@@ -118,14 +119,14 @@ Deno.test("queryDatabase one", async () => {
         },
       ],
       [
-        propertyIdFromString("ZX%3CB"),
+        propertyIdFrom("ZX%3CB"),
         {
           name: "ステータス",
           value: {
             type: "select",
             select: [
               {
-                id: selectIdFromString("adde31eb4432411d846c43059dad2f58"),
+                id: selectIdFrom("adde31eb4432411d846c43059dad2f58"),
                 name: "未着手",
                 color: "default",
               },
@@ -144,7 +145,7 @@ Deno.test("queryDatabase not found", async () => {
       for await (
         const page of queryDatabase({
           apiKey,
-          databaseId: pageIdFromString("f0c37c083b574327a1bf65bea3130dd6"),
+          databaseId: databaseIdFrom("f0c37c083b574327a1bf65bea3130dd6"),
         })
       ) {
         console.log(page);
