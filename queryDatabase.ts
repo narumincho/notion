@@ -1,4 +1,6 @@
 import {
+  type DatabaseId,
+  databaseIdFromString,
   type PageId,
   pageIdFromString,
   type PropertyId,
@@ -73,11 +75,10 @@ export const queryDatabase = async function* (parameter: {
       );
     }
     for (const page of response.results) {
-      console.log(page.properties);
       yield {
         id: pageIdFromString(page.id),
         createdTime: new Date(page.created_time),
-        lastEditedIime: new Date(page.last_edited_time),
+        lastEditedTime: new Date(page.last_edited_time),
         createdByUserId: userIdFromString(page.created_by.id),
         lastEditedByUserId: userIdFromString(page.last_edited_by.id),
         inTrash: page.in_trash,
@@ -175,56 +176,60 @@ type RawPropertyValue =
     readonly type: "checkbox";
     readonly checkbox: boolean;
     readonly id: string;
-  }; // | {
-//   type: "files";
-//   files: Array<
-//     | {
-//       file: { url: string; expiry_time: string };
-//       name: StringRequest;
-//       type?: "file";
-//     }
-//     | {
-//       external: { url: TextRequest };
-//       name: StringRequest;
-//       type?: "external";
-//     }
-//   >;
-//   id: string;
-// }
-// | {
-//   type: "created_by";
-//   created_by: PartialUserObjectResponse | UserObjectResponse;
-//   id: string;
-// }
-// | { type: "created_time"; created_time: string; id: string }
-// | {
-//   type: "last_edited_by";
-//   last_edited_by: PartialUserObjectResponse | UserObjectResponse;
-//   id: string;
-// }
-// | { type: "last_edited_time"; last_edited_time: string; id: string }
-// | { type: "formula"; formula: FormulaPropertyResponse; id: string }
-// | { type: "button"; button: Record<string, never>; id: string }
-// | {
-//   type: "unique_id";
-//   unique_id: { prefix: string | null; number: number | null };
-//   id: string;
-// }
-// | {
-//   type: "verification";
-//   verification:
-//     | VerificationPropertyUnverifiedResponse
-//     | null
-//     | VerificationPropertyResponse
-//     | null;
-//   id: string;
-// }
-// | { type: "title"; title: Array<RichTextItemResponse>; id: string }
-// | {
-//   type: "rich_text";
-//   rich_text: Array<RichTextItemResponse>;
-//   id: string;
-// }
+  } // | {
+  //   type: "files";
+  //   files: Array<
+  //     | {
+  //       file: { url: string; expiry_time: string };
+  //       name: StringRequest;
+  //       type?: "file";
+  //     }
+  //     | {
+  //       external: { url: TextRequest };
+  //       name: StringRequest;
+  //       type?: "external";
+  //     }
+  //   >;
+  //   id: string;
+  // }
+  // | {
+  //   type: "created_by";
+  //   created_by: PartialUserObjectResponse | UserObjectResponse;
+  //   id: string;
+  // }
+  // | { type: "created_time"; created_time: string; id: string }
+  // | {
+  //   type: "last_edited_by";
+  //   last_edited_by: PartialUserObjectResponse | UserObjectResponse;
+  //   id: string;
+  // }
+  // | { type: "last_edited_time"; last_edited_time: string; id: string }
+  // | { type: "formula"; formula: FormulaPropertyResponse; id: string }
+  // | { type: "button"; button: Record<string, never>; id: string }
+  // | {
+  //   type: "unique_id";
+  //   unique_id: { prefix: string | null; number: number | null };
+  //   id: string;
+  // }
+  // | {
+  //   type: "verification";
+  //   verification:
+  //     | VerificationPropertyUnverifiedResponse
+  //     | null
+  //     | VerificationPropertyResponse
+  //     | null;
+  //   id: string;
+  // }
+  | {
+    readonly type: "title";
+    title: Array<RawRichTextItemResponse>;
+    readonly id: string;
+  }
+  | {
+    readonly type: "rich_text";
+    readonly rich_text: Array<RawRichTextItemResponse>;
+    readonly id: string;
+  };
 // | {
 //   type: "people";
 //   people: Array<PartialUserObjectResponse | UserObjectResponse>;
@@ -317,6 +322,162 @@ type PartialSelectResponse = {
   readonly name: string;
 };
 
+type RawRichTextItemResponse =
+  | RawTextRichTextItemResponse
+  | RawMentionRichTextItemResponse
+  | RawEquationRichTextItemResponse;
+
+type RawTextRichTextItemResponse = {
+  readonly type: "text";
+  readonly text: {
+    readonly content: string;
+    readonly link: { readonly url: string } | null;
+  };
+  readonly annotations: AnnotationResponse;
+  readonly plain_text: string;
+  readonly href: string | null;
+};
+
+export type AnnotationResponse = {
+  readonly bold: boolean;
+  readonly italic: boolean;
+  readonly strikethrough: boolean;
+  readonly underline: boolean;
+  readonly code: boolean;
+  readonly color:
+    | "default"
+    | "gray"
+    | "brown"
+    | "orange"
+    | "yellow"
+    | "green"
+    | "blue"
+    | "purple"
+    | "pink"
+    | "red"
+    | "gray_background"
+    | "brown_background"
+    | "orange_background"
+    | "yellow_background"
+    | "green_background"
+    | "blue_background"
+    | "purple_background"
+    | "pink_background"
+    | "red_background";
+};
+
+type PartialUserObjectResponse = {
+  readonly id: string;
+  readonly object: "user";
+};
+
+type RawMentionRichTextItemResponse = {
+  readonly type: "mention";
+  readonly mention:
+    | { readonly type: "user"; readonly user: PartialUserObjectResponse }
+    | { readonly type: "date"; readonly date: DateResponse }
+    | {
+      readonly type: "link_preview";
+      readonly link_preview: { url: string };
+    }
+    | {
+      readonly type: "template_mention";
+      readonly template_mention: TemplateMentionResponse;
+    }
+    | { readonly type: "page"; readonly page: { readonly id: string } }
+    | { readonly type: "database"; readonly database: { readonly id: string } };
+  readonly annotations: AnnotationResponse;
+  readonly plain_text: string;
+  readonly href: string | null;
+};
+
+type TemplateMentionResponse =
+  | TemplateMentionDateTemplateMentionResponse
+  | TemplateMentionUserTemplateMentionResponse;
+
+type TemplateMentionDateTemplateMentionResponse = {
+  readonly type: "template_mention_date";
+  readonly template_mention_date: "today" | "now";
+};
+
+type TemplateMentionUserTemplateMentionResponse = {
+  readonly type: "template_mention_user";
+  readonly template_mention_user: "me";
+};
+
+type RawEquationRichTextItemResponse = {
+  readonly type: "equation";
+  readonly equation: { readonly expression: string };
+  readonly annotations: AnnotationResponse;
+  readonly plain_text: string;
+  readonly href: string | null;
+};
+
+export type RichTextItemResponse = {
+  readonly annotations: AnnotationResponse;
+  readonly plainText: string;
+  readonly href: URL | undefined;
+  readonly content: RichTextItemResponseContent;
+};
+
+/**
+ * https://developers.notion.com/reference/rich-text
+ */
+export type RichTextItemResponseContent =
+  | TextRichTextItemResponse
+  | MentionRichTextItemResponse
+  | EquationRichTextItemResponse;
+
+/**
+ * https://developers.notion.com/reference/rich-text#text
+ */
+export type TextRichTextItemResponse = {
+  /**
+   * https://developers.notion.com/reference/rich-text#text
+   */
+  readonly type: "text";
+};
+
+/**
+ * https://developers.notion.com/reference/rich-text#mention
+ */
+export type MentionRichTextItemResponse = {
+  /**
+   * https://developers.notion.com/reference/rich-text#mention
+   */
+  readonly type: "mention";
+  /**
+   * https://developers.notion.com/reference/rich-text#mention
+   */
+  readonly mention:
+    | { readonly type: "user"; readonly userId: UserId }
+    | { readonly type: "date"; readonly date: DateResponse }
+    | {
+      readonly type: "linkPreview";
+      readonly linkPreview: URL;
+    }
+    | {
+      readonly type: "templateMention";
+      readonly templateMention: TemplateMentionResponse;
+    }
+    | { readonly type: "page"; readonly pageId: PageId }
+    | { readonly type: "database"; readonly databaseId: DatabaseId };
+};
+
+/**
+ * https://developers.notion.com/reference/rich-text#equation
+ */
+type EquationRichTextItemResponse = {
+  /**
+   * https://developers.notion.com/reference/rich-text#equation
+   */
+  readonly type: "equation";
+  /**
+   * https://developers.notion.com/reference/rich-text#equation
+   */
+  readonly equation: string;
+};
+
 export type SelectColor =
   | "default"
   | "gray"
@@ -341,7 +502,7 @@ export type DateResponse = {
 export type Page = {
   readonly id: PageId;
   readonly createdTime: Date;
-  readonly lastEditedIime: Date;
+  readonly lastEditedTime: Date;
   readonly createdByUserId: UserId;
   readonly lastEditedByUserId: UserId;
   readonly inTrash: boolean;
@@ -374,7 +535,7 @@ export type PropertyValue =
      */
     readonly type: "select";
     readonly select: Array<SelectResponse>;
-    readonly selectType: "select" | "multi_select" | "status";
+    readonly selectType: "select" | "multiSelect" | "status";
   }
   | {
     /**
@@ -397,8 +558,8 @@ export type PropertyValue =
     /**
      * https://developers.notion.com/reference/page-property-values#phone-number
      */
-    readonly type: "phone_number";
-    readonly phone_number: string | undefined;
+    readonly type: "phoneNumber";
+    readonly phoneNumber: string | undefined;
   }
   | {
     /**
@@ -406,6 +567,15 @@ export type PropertyValue =
      */
     readonly type: "checkbox";
     readonly checkbox: boolean;
+  }
+  | {
+    /**
+     * - title https://developers.notion.com/reference/page-property-values#title
+     * - rich_text https://developers.notion.com/reference/page-property-values#rich-text
+     */
+    readonly type: "richText";
+    readonly richText: Array<RichTextItemResponse>;
+    readonly richTextType: "title" | "richText";
   }
   | { readonly type: "unsupported" };
 
@@ -443,7 +613,7 @@ const rawPropertyValueToPropertyValue = (
           name: select.name,
           color: select.color,
         })),
-        selectType: "multi_select",
+        selectType: "multiSelect",
       };
     case "status":
       return {
@@ -467,12 +637,88 @@ const rawPropertyValueToPropertyValue = (
       return { type: "email", email: raw.email ?? undefined };
     case "phone_number":
       return {
-        type: "phone_number",
-        phone_number: raw.phone_number ?? undefined,
+        type: "phoneNumber",
+        phoneNumber: raw.phone_number ?? undefined,
       };
     case "checkbox":
       return { type: "checkbox", checkbox: raw.checkbox };
+    case "title":
+      return {
+        type: "richText",
+        richText: raw.title.map(richTextItemResponseFromRaw),
+        richTextType: "title",
+      };
+    case "rich_text":
+      return {
+        type: "richText",
+        richText: raw.rich_text.map(richTextItemResponseFromRaw),
+        richTextType: "richText",
+      };
     default:
       return { type: "unsupported" };
+  }
+};
+
+const richTextItemResponseFromRaw = (
+  raw: RawRichTextItemResponse,
+): RichTextItemResponse => {
+  switch (raw.type) {
+    case "text":
+      return {
+        annotations: raw.annotations,
+        plainText: raw.plain_text,
+        href: raw.href === null ? undefined : new URL(raw.href),
+        content: {
+          type: "text",
+        },
+      };
+    case "mention":
+      return {
+        annotations: raw.annotations,
+        plainText: raw.plain_text,
+        href: raw.href === null ? undefined : new URL(raw.href),
+        content: {
+          type: "mention",
+          mention: mentionRichTextItemResponseFromRaw(raw.mention),
+        },
+      };
+    case "equation":
+      return {
+        annotations: raw.annotations,
+        plainText: raw.plain_text,
+        href: raw.href === null ? undefined : new URL(raw.href),
+        content: {
+          type: "equation",
+          equation: raw.equation.expression,
+        },
+      };
+  }
+};
+
+const mentionRichTextItemResponseFromRaw = (
+  raw: RawMentionRichTextItemResponse["mention"],
+): MentionRichTextItemResponse["mention"] => {
+  switch (raw.type) {
+    case "user":
+      return { type: "user", userId: userIdFromString(raw.user.id) };
+    case "date":
+      return { type: "date", date: raw.date };
+    case "link_preview":
+      return {
+        type: "linkPreview",
+        linkPreview: new URL(raw.link_preview.url),
+      };
+    case "template_mention":
+      return {
+        type: "templateMention",
+        templateMention: raw.template_mention,
+      };
+    case "page":
+      return { type: "page", pageId: pageIdFromString(raw.page.id) };
+    case "database":
+      return {
+        type: "database",
+        databaseId: databaseIdFromString(raw.database.id),
+      };
   }
 };

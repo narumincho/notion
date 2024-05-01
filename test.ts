@@ -44,7 +44,46 @@ Deno.test("queryDatabase one", async () => {
         {
           name: "名前",
           value: {
-            type: "unsupported",
+            type: "richText",
+            richTextType: "title",
+            richText: [
+              {
+                annotations: {
+                  bold: false,
+                  code: false,
+                  color: "default",
+                  italic: false,
+                  strikethrough: false,
+                  underline: false,
+                },
+                href: undefined,
+                plainText: "A ",
+                content: {
+                  type: "text",
+                },
+              },
+              {
+                annotations: {
+                  bold: false,
+                  code: false,
+                  color: "default",
+                  italic: false,
+                  strikethrough: false,
+                  underline: false,
+                },
+                content: {
+                  type: "mention",
+                  mention: {
+                    type: "user",
+                    userId: userIdFromString(
+                      "b98a5d4e7d88422b8e58dcf58d45b7f0",
+                    ),
+                  },
+                },
+                href: undefined,
+                plainText: "@Anonymous",
+              },
+            ],
           },
         },
       ],
@@ -61,7 +100,7 @@ Deno.test("queryDatabase one", async () => {
                 color: "green",
               },
             ],
-            selectType: "multi_select",
+            selectType: "multiSelect",
           },
         },
       ],

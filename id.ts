@@ -28,6 +28,21 @@ export const pageIdFromString = (id: string): PageId => {
 };
 
 /**
+ * データベースID. 作成時に`-`が除去されている
+ *
+ * {@link databaseIdFromString} で作成できる
+ */
+export type DatabaseId = string & { readonly __brand: unique symbol };
+
+/**
+ * データベースIDを文字列から作成する
+ * @throws {Error} IDとして解釈できない文字列が渡された場合
+ */
+export const databaseIdFromString = (id: string): DatabaseId => {
+  return normalizeOrThrowUuid<DatabaseId>(id, "DatabaseId");
+};
+
+/**
  * ユーザーID. 作成時に`-`が除去されている
  *
  * {@link userIdFromString} で作成できる
