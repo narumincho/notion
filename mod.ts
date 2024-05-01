@@ -388,6 +388,27 @@ export type PropertyValue =
       readonly end: Date | undefined;
     } | undefined;
   }
+  | {
+    /**
+     * https://developers.notion.com/reference/page-property-values#email
+     */
+    readonly type: "email";
+    readonly email: string | undefined;
+  }
+  | {
+    /**
+     * https://developers.notion.com/reference/page-property-values#phone-number
+     */
+    readonly type: "phone_number";
+    readonly phone_number: string | undefined;
+  }
+  | {
+    /**
+     * https://developers.notion.com/reference/page-property-values#checkbox
+     */
+    readonly type: "checkbox";
+    readonly checkbox: boolean;
+  }
   | { readonly type: "unsupported" };
 
 export type SelectResponse = {
@@ -445,8 +466,14 @@ const rawPropertyValueToPropertyValue = (
         },
       };
     case "email":
+      return { type: "email", email: raw.email ?? undefined };
     case "phone_number":
+      return {
+        type: "phone_number",
+        phone_number: raw.phone_number ?? undefined,
+      };
     case "checkbox":
+      return { type: "checkbox", checkbox: raw.checkbox };
     default:
       return { type: "unsupported" };
   }
