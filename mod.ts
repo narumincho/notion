@@ -1,5 +1,9 @@
 import type { PageId } from "./id.ts";
-import type { Page, RichTextItemResponse } from "./queryDatabase.ts";
+import type {
+  Page,
+  PropertyValue,
+  RichTextItemResponse,
+} from "./queryDatabase.ts";
 
 export * from "./id.ts";
 export * from "./queryDatabase.ts";
@@ -33,4 +37,35 @@ export const richTextToPlainText = (
   richText: ReadonlyArray<RichTextItemResponse>,
 ): string => {
   return richText.map((text) => text.plainText).join("");
+};
+
+/**
+ * Notionのページのプロパティからテキストを取得する
+ */
+export const propertyValueToString = (
+  property: PropertyValue,
+): string => {
+  switch (property.type) {
+    case "richText":
+      return richTextToPlainText(property.richText);
+    case "select":
+      return property.select.map((select) => select.name).join(", ");
+    case "url":
+      return property.url?.toString() ?? "";
+    case "date":
+      return property.date
+        ? property.date.start.toISOString() +
+          (property.date.end ? `〜${property.date.end.toISOString()}` : "")
+        : "";
+    case "phoneNumber":
+      return property.phoneNumber ?? "";
+    case "email":
+      return property.email ?? "";
+    case "checkbox":
+      return property.checkbox ? "true" : "false";
+    case "number":
+      return property.number?.toString() ?? "";
+    case "unsupported":
+      return "";
+  }
 };
