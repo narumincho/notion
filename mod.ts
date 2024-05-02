@@ -7,6 +7,7 @@ import type {
 
 export * from "./id.ts";
 export * from "./queryDatabase.ts";
+export * from "./type.ts";
 
 /**
  * Notion の ID から URL を生成する

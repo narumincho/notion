@@ -10,6 +10,17 @@ import {
   type UserId,
   userIdFrom,
 } from "./id.ts";
+import type {
+  PartialUserObjectResponse,
+  RawDateResponse,
+  RawMentionRichTextItemResponse,
+  RawRichTextItemResponse,
+} from "./rawType.ts";
+import type {
+  DateResponse,
+  MentionRichTextItemResponse,
+  RichTextItemResponse,
+} from "./type.ts";
 
 /**
  * データベースから指定した条件を満たすページを複数取得する
@@ -51,9 +62,7 @@ export const queryDatabase = async function* (parameter: {
   let cursor: string | undefined = undefined;
   while (true) {
     const response: QueryDatabaseRawResponse = await (await fetch(
-      `https://api.notion.com/v1/databases/${
-        parameter.databaseId.replaceAll("-", "")
-      }/query`,
+      `https://api.notion.com/v1/databases/${parameter.databaseId}/query`,
       {
         method: "POST",
         headers: {
@@ -111,14 +120,8 @@ type QueryDatabaseRawResponse = {
     readonly id: string;
     readonly created_time: string;
     readonly last_edited_time: string;
-    readonly created_by: {
-      readonly object: "user";
-      readonly id: string;
-    };
-    readonly last_edited_by: {
-      readonly object: "user";
-      readonly id: string;
-    };
+    readonly created_by: PartialUserObjectResponse;
+    readonly last_edited_by: PartialUserObjectResponse;
     readonly in_trash: boolean;
     readonly properties: Record<
       string,
@@ -159,7 +162,7 @@ type RawPropertyValue =
   }
   | {
     readonly type: "date";
-    readonly date: DateResponse | null;
+    readonly date: RawDateResponse | null;
     readonly id: string;
   }
   | {
@@ -322,162 +325,6 @@ type PartialSelectResponse = {
   readonly name: string;
 };
 
-type RawRichTextItemResponse =
-  | RawTextRichTextItemResponse
-  | RawMentionRichTextItemResponse
-  | RawEquationRichTextItemResponse;
-
-type RawTextRichTextItemResponse = {
-  readonly type: "text";
-  readonly text: {
-    readonly content: string;
-    readonly link: { readonly url: string } | null;
-  };
-  readonly annotations: AnnotationResponse;
-  readonly plain_text: string;
-  readonly href: string | null;
-};
-
-export type AnnotationResponse = {
-  readonly bold: boolean;
-  readonly italic: boolean;
-  readonly strikethrough: boolean;
-  readonly underline: boolean;
-  readonly code: boolean;
-  readonly color:
-    | "default"
-    | "gray"
-    | "brown"
-    | "orange"
-    | "yellow"
-    | "green"
-    | "blue"
-    | "purple"
-    | "pink"
-    | "red"
-    | "gray_background"
-    | "brown_background"
-    | "orange_background"
-    | "yellow_background"
-    | "green_background"
-    | "blue_background"
-    | "purple_background"
-    | "pink_background"
-    | "red_background";
-};
-
-type PartialUserObjectResponse = {
-  readonly id: string;
-  readonly object: "user";
-};
-
-type RawMentionRichTextItemResponse = {
-  readonly type: "mention";
-  readonly mention:
-    | { readonly type: "user"; readonly user: PartialUserObjectResponse }
-    | { readonly type: "date"; readonly date: DateResponse }
-    | {
-      readonly type: "link_preview";
-      readonly link_preview: { url: string };
-    }
-    | {
-      readonly type: "template_mention";
-      readonly template_mention: TemplateMentionResponse;
-    }
-    | { readonly type: "page"; readonly page: { readonly id: string } }
-    | { readonly type: "database"; readonly database: { readonly id: string } };
-  readonly annotations: AnnotationResponse;
-  readonly plain_text: string;
-  readonly href: string | null;
-};
-
-type TemplateMentionResponse =
-  | TemplateMentionDateTemplateMentionResponse
-  | TemplateMentionUserTemplateMentionResponse;
-
-type TemplateMentionDateTemplateMentionResponse = {
-  readonly type: "template_mention_date";
-  readonly template_mention_date: "today" | "now";
-};
-
-type TemplateMentionUserTemplateMentionResponse = {
-  readonly type: "template_mention_user";
-  readonly template_mention_user: "me";
-};
-
-type RawEquationRichTextItemResponse = {
-  readonly type: "equation";
-  readonly equation: { readonly expression: string };
-  readonly annotations: AnnotationResponse;
-  readonly plain_text: string;
-  readonly href: string | null;
-};
-
-export type RichTextItemResponse = {
-  readonly annotations: AnnotationResponse;
-  readonly plainText: string;
-  readonly href: URL | undefined;
-  readonly content: RichTextItemResponseContent;
-};
-
-/**
- * https://developers.notion.com/reference/rich-text
- */
-export type RichTextItemResponseContent =
-  | TextRichTextItemResponse
-  | MentionRichTextItemResponse
-  | EquationRichTextItemResponse;
-
-/**
- * https://developers.notion.com/reference/rich-text#text
- */
-export type TextRichTextItemResponse = {
-  /**
-   * https://developers.notion.com/reference/rich-text#text
-   */
-  readonly type: "text";
-};
-
-/**
- * https://developers.notion.com/reference/rich-text#mention
- */
-export type MentionRichTextItemResponse = {
-  /**
-   * https://developers.notion.com/reference/rich-text#mention
-   */
-  readonly type: "mention";
-  /**
-   * https://developers.notion.com/reference/rich-text#mention
-   */
-  readonly mention:
-    | { readonly type: "user"; readonly userId: UserId }
-    | { readonly type: "date"; readonly date: DateResponse }
-    | {
-      readonly type: "linkPreview";
-      readonly linkPreview: URL;
-    }
-    | {
-      readonly type: "templateMention";
-      readonly templateMention: TemplateMentionResponse;
-    }
-    | { readonly type: "page"; readonly pageId: PageId }
-    | { readonly type: "database"; readonly databaseId: DatabaseId };
-};
-
-/**
- * https://developers.notion.com/reference/rich-text#equation
- */
-type EquationRichTextItemResponse = {
-  /**
-   * https://developers.notion.com/reference/rich-text#equation
-   */
-  readonly type: "equation";
-  /**
-   * https://developers.notion.com/reference/rich-text#equation
-   */
-  readonly equation: string;
-};
-
 export type SelectColor =
   | "default"
   | "gray"
@@ -489,15 +336,6 @@ export type SelectColor =
   | "purple"
   | "pink"
   | "red";
-
-export type DateResponse = {
-  readonly start: string;
-  readonly end: string | null;
-  /**
-   * always null
-   */
-  readonly time_zone: null;
-};
 
 export type Page = {
   readonly id: PageId;
@@ -542,10 +380,7 @@ export type PropertyValue =
      * https://developers.notion.com/reference/page-property-values#date
      */
     readonly type: "date";
-    readonly date: {
-      readonly start: Date;
-      readonly end: Date | undefined;
-    } | undefined;
+    readonly date: DateResponse | undefined;
   }
   | {
     /**
@@ -702,7 +537,13 @@ const mentionRichTextItemResponseFromRaw = (
     case "user":
       return { type: "user", userId: userIdFrom(raw.user.id) };
     case "date":
-      return { type: "date", date: raw.date };
+      return {
+        type: "date",
+        date: {
+          start: new Date(raw.date.start),
+          end: raw.date.end ? new Date(raw.date.end) : undefined,
+        },
+      };
     case "link_preview":
       return {
         type: "linkPreview",

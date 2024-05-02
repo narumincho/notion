@@ -10,6 +10,7 @@ import {
 import { assertEquals, assertRejects } from "jsr:@std/assert";
 import secret from "./secret.json" with { type: "json" };
 import { databaseIdFrom } from "./id.ts";
+import { retrieveBlockChildren } from "./retrieveBlockChildren.ts";
 
 const { apiKey } = secret;
 
@@ -154,4 +155,16 @@ Deno.test("queryDatabase not found", async () => {
     Error,
     "object_not_found",
   );
+});
+
+Deno.test("retrieveBlockChildren one", async () => {
+  const result = [];
+  for await (
+    const block of retrieveBlockChildren({
+      apiKey,
+      blockId: pageIdFrom("b0d037d8b54044dca71cd0350b5f3001"),
+    })
+  ) {
+    result.push(block);
+  }
 });
