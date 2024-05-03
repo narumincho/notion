@@ -1,9 +1,19 @@
-import { ExistencePropertyFilter } from "./filter/existence.ts";
-import { DatePropertyFilter } from "./filter/date.ts";
+import type { ExistencePropertyFilter } from "./filter/existence.ts";
+import type { DatePropertyFilter } from "./filter/date.ts";
+import type { TextPropertyFilter } from "./filter/richText.ts";
+import type { NumberPropertyFilter } from "./filter/number.ts";
+import type { CheckboxPropertyFilter } from "./filter/checkbox.ts";
+import { SelectPropertyFilter } from "./filter/select.ts";
+
+export * as date from "./filter/date.ts";
+export * as richText from "./filter/richText.ts";
+export * as number from "./filter/number.ts";
+export * as checkbox from "./filter/checkbox.ts";
+export * as select from "./filter/select.ts";
 
 export type Filter =
   | {
-    or: ReadonlyArray<
+    readonly or: ReadonlyArray<
       | PropertyFilter
       | TimestampCreatedTimeFilter
       | TimestampLastEditedTimeFilter
@@ -12,12 +22,12 @@ export type Filter =
     >;
   }
   | {
-    and: ReadonlyArray<
+    readonly and: ReadonlyArray<
       | PropertyFilter
       | TimestampCreatedTimeFilter
       | TimestampLastEditedTimeFilter
-      | { or: Array<PropertyFilter> }
-      | { and: Array<PropertyFilter> }
+      | { readonly or: Array<PropertyFilter> }
+      | { readonly and: Array<PropertyFilter> }
     >;
   }
   | PropertyFilter
@@ -25,43 +35,16 @@ export type Filter =
   | TimestampLastEditedTimeFilter;
 
 export type TimestampCreatedTimeFilter = {
-  created_time: DatePropertyFilter;
-  timestamp: "created_time";
-  type: "created_time";
+  readonly created_time: DatePropertyFilter;
+  readonly timestamp: "created_time";
+  readonly type: "created_time";
 };
 
 export type TimestampLastEditedTimeFilter = {
-  last_edited_time: DatePropertyFilter;
-  timestamp: "last_edited_time";
-  type: "last_edited_time";
+  readonly last_edited_time: DatePropertyFilter;
+  readonly timestamp: "last_edited_time";
+  readonly type: "last_edited_time";
 };
-
-export type TextPropertyFilter =
-  | { equals: string }
-  | { does_not_equal: string }
-  | { contains: string }
-  | { does_not_contain: string }
-  | { starts_with: string }
-  | { ends_with: string }
-  | ExistencePropertyFilter;
-
-export type NumberPropertyFilter =
-  | { equals: number }
-  | { does_not_equal: number }
-  | { greater_than: number }
-  | { less_than: number }
-  | { greater_than_or_equal_to: number }
-  | { less_than_or_equal_to: number }
-  | ExistencePropertyFilter;
-
-export type CheckboxPropertyFilter = { equals: boolean } | {
-  does_not_equal: boolean;
-};
-
-export type SelectPropertyFilter =
-  | { equals: string }
-  | { does_not_equal: string }
-  | ExistencePropertyFilter;
 
 export type MultiSelectPropertyFilter =
   | { contains: string }
@@ -188,5 +171,3 @@ export const lastEditedTime = (
   timestamp: "last_edited_time",
   type: "last_edited_time",
 });
-
-export * as date from "./filter/date.ts";

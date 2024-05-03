@@ -1,18 +1,21 @@
 import type { ExistencePropertyFilter } from "./existence.ts";
 
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#date
+ */
 export type DatePropertyFilter =
-  | { equals: string }
-  | { before: string }
-  | { after: string }
-  | { on_or_before: string }
-  | { on_or_after: string }
-  | { this_week: Record<string, never> }
-  | { past_week: Record<string, never> }
-  | { past_month: Record<string, never> }
-  | { past_year: Record<string, never> }
-  | { next_week: Record<string, never> }
-  | { next_month: Record<string, never> }
-  | { next_year: Record<string, never> }
+  | { readonly equals: string }
+  | { readonly before: string }
+  | { readonly after: string }
+  | { readonly on_or_before: string }
+  | { readonly on_or_after: string }
+  | { readonly this_week: Record<string, never> }
+  | { readonly past_week: Record<string, never> }
+  | { readonly past_month: Record<string, never> }
+  | { readonly past_year: Record<string, never> }
+  | { readonly next_week: Record<string, never> }
+  | { readonly next_month: Record<string, never> }
+  | { readonly next_year: Record<string, never> }
   | ExistencePropertyFilter;
 
 export const equals = (date: Date): DatePropertyFilter => ({
