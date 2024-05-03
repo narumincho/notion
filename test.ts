@@ -152,7 +152,13 @@ Deno.test("queryDatabase one", async () => {
         {
           name: "データベーステストとのリレーション",
           value: {
-            type: "unsupported",
+            type: "relation",
+            hasMore: false,
+            ids: [
+              pageIdFrom("0538d3d5058a484bb4db1a911fffaec9"),
+              pageIdFrom("e3389b1b7e7841c9835155b8f4757dbe"),
+              pageIdFrom("6a4e6099317f4803bf412c9899bade8c"),
+            ],
           },
         },
       ],

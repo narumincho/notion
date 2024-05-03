@@ -664,6 +664,12 @@ const rawPropertyValueToPropertyValue = (
         richText: raw.rich_text.map(richTextItemResponseFromRaw),
         richTextType: "richText",
       };
+    case "relation":
+      return {
+        type: "relation",
+        ids: raw.relation.map((relation) => pageIdFrom(relation.id)),
+        hasMore: raw.has_more,
+      };
     default:
       console.log(raw);
       return { type: "unsupported" };
