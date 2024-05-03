@@ -1,4 +1,5 @@
 import {
+  filter,
   pageIdFrom,
   type PropertyId,
   propertyIdFrom,
@@ -19,13 +20,9 @@ Deno.test("queryDatabase one", async () => {
     queryDatabase({
       apiKey,
       databaseId: databaseIdFrom("a1cb2e5ca6f94399a835fdcd39a828cb"),
-      filter: {
-        type: "created_time",
-        timestamp: "created_time",
-        created_time: {
-          before: "2024-04-29T00:00:00.000Z",
-        },
-      },
+      filter: filter.createdTime(
+        filter.date.before(new Date("2024-04-29T00:00:00.000Z")),
+      ),
     }),
   );
   const [firstPage] = pages;

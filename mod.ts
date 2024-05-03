@@ -1,10 +1,11 @@
 import type { PageId } from "./id.ts";
 import type { Page, PropertyValue } from "./queryDatabase.ts";
-import { RichTextItemResponse } from "./type.ts";
+import type { RichTextItemResponse } from "./type.ts";
 
 export * from "./id.ts";
 export * from "./queryDatabase.ts";
 export * from "./type.ts";
+export * as filter from "./filter.ts";
 
 /**
  * Notion の ID から URL を生成する
@@ -63,6 +64,8 @@ export const propertyValueToString = (
       return property.checkbox ? "true" : "false";
     case "number":
       return property.number?.toString() ?? "";
+    case "relation":
+      return property.ids.join(", ");
     case "unsupported":
       return "";
   }
