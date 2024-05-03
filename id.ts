@@ -5,7 +5,7 @@ const normalizeOrThrowUuid = <T extends string>(
   if (typeof id !== "string") {
     throw new Error(`Invalid ${typeName} expected uuid string: ${id}`);
   }
-  const normalized = id.replaceAll("-", "");
+  const normalized = id.replaceAll("-", "").trim();
   if (!/^[0-9a-f]{32}$/u.test(normalized)) {
     throw new Error(`Invalid ${typeName} expected uuid string: ${id}`);
   }

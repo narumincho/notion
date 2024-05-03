@@ -1,5 +1,12 @@
-import { type BlockId, blockIdFrom, type PageId, userIdFrom } from "./id.ts";
-import type { UserId } from "./id.ts";
+import {
+  type BlockId,
+  blockIdFrom,
+  databaseIdFrom,
+  type PageId,
+  pageIdFrom,
+  userIdFrom,
+} from "./id.ts";
+import type { DatabaseId, UserId } from "./id.ts";
 import { richTextItemResponseFromRaw } from "./rawToType.ts";
 import type {
   PartialUserObjectResponse,
@@ -26,7 +33,7 @@ export const retrieveBlockChildren = async function* (parameter: {
    * ```txt
    * https://www.notion.so/39aaf5dc888847dbbf3b671067cf3816
    *                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   *                             ^ この部分がデータベースの ID
+   *                             ^ この部分がページID
    * ```
    *
    * @example
@@ -80,6 +87,27 @@ export const retrieveBlockChildren = async function* (parameter: {
         lastEditedByUserId: userIdFrom(block.last_edited_by.id),
         hasChildren: block.has_children,
         inTrash: block.in_trash,
+        parent: (() => {
+          switch (block.parent.type) {
+            case "database_id":
+              return {
+                type: "databaseId",
+                databaseId: databaseIdFrom(block.parent.database_id),
+              };
+            case "page_id":
+              return {
+                type: "pageId",
+                pageId: pageIdFrom(block.parent.page_id),
+              };
+            case "block_id":
+              return {
+                type: "blockId",
+                blockId: blockIdFrom(block.parent.block_id),
+              };
+            case "workspace":
+              return { type: "workspace" };
+          }
+        })(),
         content: rawBlockToBlockContent(block),
       };
     }
@@ -180,6 +208,18 @@ export type Block = {
   readonly lastEditedByUserId: UserId;
   readonly hasChildren: boolean;
   readonly inTrash: boolean;
+  readonly parent: {
+    readonly type: "databaseId";
+    readonly databaseId: DatabaseId;
+  } | {
+    readonly type: "pageId";
+    readonly pageId: PageId;
+  } | {
+    readonly type: "blockId";
+    readonly blockId: string;
+  } | {
+    readonly type: "workspace";
+  };
   readonly content: BlockContent;
 };
 
