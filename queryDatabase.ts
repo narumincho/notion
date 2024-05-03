@@ -1,4 +1,4 @@
-import { Filter } from "./filter.ts";
+import type { Filter } from "./filter.ts";
 import {
   type DatabaseId,
   type PageId,
