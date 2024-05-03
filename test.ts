@@ -15,28 +15,39 @@ import { retrieveBlockChildren } from "./retrieveBlockChildren.ts";
 const { apiKey } = secret;
 
 Deno.test("queryDatabase one", async () => {
-  const firstPage = await queryDatabase({
-    apiKey,
-    databaseId: databaseIdFrom("a1cb2e5ca6f94399a835fdcd39a828cb"),
-  }).next();
-  if (firstPage.done) {
+  const pages = await Array.fromAsync(
+    queryDatabase({
+      apiKey,
+      databaseId: databaseIdFrom("a1cb2e5ca6f94399a835fdcd39a828cb"),
+      filter: {
+        type: "created_time",
+        timestamp: "created_time",
+        created_time: {
+          before: "2024-04-29T00:00:00.000Z",
+        },
+      },
+    }),
+  );
+  const [firstPage] = pages;
+  assertEquals(pages.length, 1);
+  if (firstPage === undefined) {
     throw new Error("No page found");
   }
   assertEquals(
-    firstPage.value.id,
+    firstPage.id,
     pageIdFrom("e3389b1b7e7841c9835155b8f4757dbe"),
   );
   assertEquals(
-    firstPage.value.createdByUserId,
+    firstPage.createdByUserId,
     userIdFrom("b98a5d4e7d88422b8e58dcf58d45b7f0"),
   );
   assertEquals(
-    firstPage.value.createdTime,
+    firstPage.createdTime,
     new Date("2024-04-27T12:18:00.000Z"),
   );
-  assertEquals(firstPage.value.inTrash, false);
+  assertEquals(firstPage.inTrash, false);
   assertEquals(
-    firstPage.value.properties,
+    firstPage.properties,
     new Map<PropertyId, {
       readonly name: string;
       readonly value: PropertyValue;
@@ -98,7 +109,7 @@ Deno.test("queryDatabase one", async () => {
             select: [
               {
                 id: selectIdFrom("392f963c2cc44009a24121b704c04042"),
-                name: "A",
+                name: "あ",
                 color: "green",
               },
             ],
@@ -133,6 +144,15 @@ Deno.test("queryDatabase one", async () => {
               },
             ],
             selectType: "status",
+          },
+        },
+      ],
+      [
+        propertyIdFrom("%3AY%5C%5D"),
+        {
+          name: "データベーステストとのリレーション",
+          value: {
+            type: "unsupported",
           },
         },
       ],
