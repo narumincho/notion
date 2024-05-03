@@ -1,6 +1,10 @@
-import type { BlockId, PageId } from "./id.ts";
+import { type BlockId, blockIdFrom, type PageId, userIdFrom } from "./id.ts";
 import type { UserId } from "./id.ts";
-import type { PartialUserObjectResponse } from "./rawType.ts";
+import { richTextItemResponseFromRaw } from "./rawToType.ts";
+import type {
+  PartialUserObjectResponse,
+  RawRichTextItemResponse,
+} from "./rawType.ts";
 import type { ApiColor, RichTextItemResponse } from "./type.ts";
 
 /**
@@ -51,7 +55,7 @@ export const retrieveBlockChildren = async function* (parameter: {
     if (typeof parameter.pageSize === "number") {
       url.searchParams.set("page_size", parameter.pageSize.toString());
     }
-    const response = await (await fetch(
+    const response: RawRetrieveBlockChildrenResponse = await (await fetch(
       url,
       {
         method: "GET",
@@ -67,12 +71,34 @@ export const retrieveBlockChildren = async function* (parameter: {
       );
     }
     console.log(response);
+    for (const block of response.results) {
+      yield {
+        id: blockIdFrom(block.id),
+        createdTime: new Date(block.created_time),
+        createdByUserId: userIdFrom(block.created_by.id),
+        lastEditedTime: new Date(block.last_edited_time),
+        lastEditedByUserId: userIdFrom(block.last_edited_by.id),
+        hasChildren: block.has_children,
+        inTrash: block.in_trash,
+        content: rawBlockToBlockContent(block),
+      };
+    }
     if (typeof response.next_cursor === "string") {
       cursor = response.next_cursor;
     } else {
       return;
     }
   }
+};
+
+type RawRetrieveBlockChildrenResponse = {
+  readonly object: "error";
+  readonly code: string;
+  readonly message: string;
+} | {
+  readonly object: "list";
+  readonly results: ReadonlyArray<RawBlock>;
+  readonly next_cursor: string | null;
 };
 
 type RawBlock =
@@ -82,7 +108,7 @@ type RawBlock =
 type RawParagraphBlockObjectResponse = {
   readonly type: "paragraph";
   readonly paragraph: {
-    readonly rich_text: Array<RichTextItemResponse>;
+    readonly rich_text: Array<RawRichTextItemResponse>;
     readonly color: ApiColor;
   };
   readonly parent:
@@ -100,10 +126,10 @@ type RawParagraphBlockObjectResponse = {
   readonly in_trash: boolean;
 };
 
-export type RawHeading1BlockObjectResponse = {
+type RawHeading1BlockObjectResponse = {
   readonly type: "heading_1";
   readonly heading_1: {
-    readonly rich_text: Array<RichTextItemResponse>;
+    readonly rich_text: Array<RawRichTextItemResponse>;
     readonly color: ApiColor;
     readonly is_toggleable: boolean;
   };
@@ -122,18 +148,44 @@ export type RawHeading1BlockObjectResponse = {
   readonly in_trash: boolean;
 };
 
+const rawBlockToBlockContent = (rawBlock: RawBlock): BlockContent => {
+  switch (rawBlock.type) {
+    case "paragraph":
+      return {
+        type: "paragraph",
+        rich_text: rawBlock.paragraph.rich_text.map(
+          richTextItemResponseFromRaw,
+        ),
+        color: rawBlock.paragraph.color,
+      };
+    case "heading_1":
+      return {
+        type: "heading1",
+        rich_text: rawBlock.heading_1.rich_text.map(
+          richTextItemResponseFromRaw,
+        ),
+        color: rawBlock.heading_1.color,
+        isToggleable: rawBlock.heading_1.is_toggleable,
+      };
+    default:
+      return { type: "unsupported" };
+  }
+};
+
 export type Block = {
   readonly id: BlockId;
   readonly createdTime: Date;
   readonly createdByUserId: UserId;
   readonly lastEditedTime: Date;
-  readonly lastEditedBy: PartialUserObjectResponse;
+  readonly lastEditedByUserId: UserId;
   readonly hasChildren: boolean;
   readonly inTrash: boolean;
   readonly content: BlockContent;
 };
 
-export type BlockContent = Paragraph | Heading1;
+export type BlockContent = Paragraph | Heading1 | {
+  readonly type: "unsupported";
+};
 
 /**
  * https://developers.notion.com/reference/block#paragraph

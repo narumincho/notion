@@ -1,4 +1,4 @@
-import { DatabaseId, PageId, UserId } from "./id.ts";
+import type { DatabaseId, PageId, UserId } from "./id.ts";
 
 export type TemplateMentionResponse =
   | TemplateMentionDateTemplateMentionResponse

@@ -9,7 +9,7 @@ import {
 } from "./mod.ts";
 import { assertEquals, assertRejects } from "jsr:@std/assert";
 import secret from "./secret.json" with { type: "json" };
-import { databaseIdFrom } from "./id.ts";
+import { blockIdFrom, databaseIdFrom } from "./id.ts";
 import { retrieveBlockChildren } from "./retrieveBlockChildren.ts";
 
 const { apiKey } = secret;
@@ -158,13 +158,200 @@ Deno.test("queryDatabase not found", async () => {
 });
 
 Deno.test("retrieveBlockChildren one", async () => {
-  const result = [];
-  for await (
-    const block of retrieveBlockChildren({
+  assertEquals(
+    await Array.fromAsync(retrieveBlockChildren({
       apiKey,
       blockId: pageIdFrom("b0d037d8b54044dca71cd0350b5f3001"),
-    })
-  ) {
-    result.push(block);
-  }
+    })),
+    [
+      {
+        content: {
+          color: "default",
+          rich_text: [
+            {
+              annotations: {
+                bold: false,
+                code: false,
+                color: "default",
+                italic: false,
+                strikethrough: false,
+                underline: false,
+              },
+              href: undefined,
+              plainText: "本文サンプル",
+              content: {
+                type: "text",
+              },
+            },
+          ],
+          type: "paragraph",
+        },
+        createdByUserId: userIdFrom("b98a5d4e7d88422b8e58dcf58d45b7f0"),
+        createdTime: new Date("2024-05-01T09:28:00.000Z"),
+        hasChildren: false,
+        id: blockIdFrom("6b4b9ca65d424a32a730c692023d14f6"),
+        inTrash: false,
+        lastEditedByUserId: userIdFrom("b98a5d4e-7d88-422b-8e58-dcf58d45b7f0"),
+        lastEditedTime: new Date("2024-05-01T09:28:00.000Z"),
+      },
+      {
+        content: {
+          color: "default",
+          rich_text: [
+            {
+              annotations: {
+                bold: false,
+                code: false,
+                color: "default",
+                italic: false,
+                strikethrough: false,
+                underline: false,
+              },
+              href: undefined,
+              content: {
+                type: "mention",
+                mention: {
+                  type: "date",
+                  date: {
+                    start: new Date("2024-05-01"),
+                    end: undefined,
+                  },
+                },
+              },
+              plainText: "2024-05-01",
+            },
+            {
+              annotations: {
+                bold: false,
+                code: false,
+                color: "default",
+                italic: false,
+                strikethrough: false,
+                underline: false,
+              },
+              href: undefined,
+              plainText: " ",
+              content: {
+                type: "text",
+              },
+            },
+            {
+              annotations: {
+                bold: false,
+                code: false,
+                color: "default",
+                italic: false,
+                strikethrough: false,
+                underline: false,
+              },
+              href: undefined,
+              content: {
+                type: "mention",
+                mention: {
+                  type: "user",
+                  userId: userIdFrom("b98a5d4e-7d88-422b-8e58-dcf58d45b7f0"),
+                },
+              },
+              plainText: "@Anonymous",
+            },
+            {
+              annotations: {
+                bold: false,
+                code: false,
+                color: "default",
+                italic: false,
+                strikethrough: false,
+                underline: false,
+              },
+              href: undefined,
+              plainText: " ",
+              content: {
+                type: "text",
+              },
+            },
+            {
+              annotations: {
+                bold: false,
+                code: false,
+                color: "default",
+                italic: false,
+                strikethrough: false,
+                underline: false,
+              },
+              href: new URL(
+                "https://www.notion.so/22961d0ee2924074a22ce37f405b941a",
+              ),
+              content: {
+                type: "mention",
+                mention: {
+                  type: "page",
+                  pageId: pageIdFrom("22961d0e-e292-4074-a22c-e37f405b941a"),
+                },
+              },
+              plainText: "Untitled",
+            },
+            {
+              annotations: {
+                bold: false,
+                code: false,
+                color: "default",
+                italic: false,
+                strikethrough: false,
+                underline: false,
+              },
+              href: undefined,
+              plainText: " ",
+              content: { type: "text" },
+            },
+          ],
+          type: "paragraph",
+        },
+        createdByUserId: userIdFrom("b98a5d4e7d88422b8e58dcf58d45b7f0"),
+        createdTime: new Date("2024-05-01T09:28:00.000Z"),
+        hasChildren: false,
+        id: blockIdFrom("7588e21e214e4e4c905166c1944914bc"),
+        inTrash: false,
+        lastEditedByUserId: userIdFrom("b98a5d4e-7d88-422b-8e58-dcf58d45b7f0"),
+        lastEditedTime: new Date("2024-05-01T09:29:00.000Z"),
+      },
+      {
+        content: {
+          type: "unsupported",
+        },
+        createdByUserId: userIdFrom("b98a5d4e7d88422b8e58dcf58d45b7f0"),
+        createdTime: new Date("2024-05-01T10:12:00.000Z"),
+        hasChildren: false,
+        id: blockIdFrom("59ec4425dde349ddb61daa6d7760ff02"),
+        inTrash: false,
+        lastEditedByUserId: userIdFrom("b98a5d4e-7d88-422b-8e58-dcf58d45b7f0"),
+        lastEditedTime: new Date("2024-05-01T10:12:00.000Z"),
+      },
+      {
+        content: {
+          type: "unsupported",
+        },
+        createdByUserId: userIdFrom("b98a5d4e7d88422b8e58dcf58d45b7f0"),
+        createdTime: new Date("2024-05-01T10:13:00.000Z"),
+        hasChildren: false,
+        id: blockIdFrom("86915bd462a34e1ebf27474cd06a63c1"),
+        inTrash: false,
+        lastEditedByUserId: userIdFrom("b98a5d4e-7d88-422b-8e58-dcf58d45b7f0"),
+        lastEditedTime: new Date("2024-05-01T10:13:00.000Z"),
+      },
+      {
+        content: {
+          color: "default",
+          rich_text: [],
+          type: "paragraph",
+        },
+        createdByUserId: userIdFrom("b98a5d4e7d88422b8e58dcf58d45b7f0"),
+        createdTime: new Date("2024-05-01T10:13:00.000Z"),
+        hasChildren: false,
+        id: blockIdFrom("44fe83fd07844c86a229b0be1ba53510"),
+        inTrash: false,
+        lastEditedByUserId: userIdFrom("b98a5d4e-7d88-422b-8e58-dcf58d45b7f0"),
+        lastEditedTime: new Date("2024-05-01T10:13:00.000Z"),
+      },
+    ],
+  );
 });

@@ -1,9 +1,6 @@
 import type { PageId } from "./id.ts";
-import type {
-  Page,
-  PropertyValue,
-  RichTextItemResponse,
-} from "./queryDatabase.ts";
+import type { Page, PropertyValue } from "./queryDatabase.ts";
+import { RichTextItemResponse } from "./type.ts";
 
 export * from "./id.ts";
 export * from "./queryDatabase.ts";
