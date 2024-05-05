@@ -13,6 +13,21 @@ const normalizeOrThrowUuid = <T extends string>(
 };
 
 /**
+ * コメントID. 作成時に`-`が除去されている
+ *
+ * {@link commentIdFrom} で作成できる
+ */
+export type CommentId = string & { readonly __brand: unique symbol };
+
+/**
+ * コメントIDを文字列から作成する
+ * @throws {Error} IDとして解釈できない文字列が渡された場合
+ */
+export const commentIdFrom = (id: string): CommentId => {
+  return normalizeOrThrowUuid<CommentId>(id, "CommentId");
+};
+
+/**
  * ブロックID. 作成時に`-`が除去されている
  *
  * {@link blockIdFrom} で作成できる
