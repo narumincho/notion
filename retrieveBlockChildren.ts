@@ -22,9 +22,9 @@ import type {
 
 /**
  * ページに含まれるブロックもしくは, ブロックの子ブロックを取得する
- * @see https://developers.notion.com/reference/get-block-children
+ * https://developers.notion.com/reference/get-block-children
  */
-export const retrieveBlockChildren = async function* (parameter: {
+export async function* retrieveBlockChildren(parameter: {
   /**
    * https://www.notion.so/my-integrations で確認, 発行できる鍵
    * @example
@@ -123,7 +123,7 @@ export const retrieveBlockChildren = async function* (parameter: {
       return;
     }
   }
-};
+}
 
 type RawRetrieveBlockChildrenResponse = {
   readonly object: "error";
