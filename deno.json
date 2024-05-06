@@ -1,6 +1,6 @@
 {
   "name": "@narumincho/notion",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "compilerOptions": {
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true
