@@ -165,229 +165,338 @@ export type PropertyFilter =
     readonly type: "rollup";
   };
 
-export const or = <
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#compound-filter-conditions
+ */
+export function or<
   T extends
     | PropertyFilter
     | TimestampCreatedTimeFilter
     | TimestampLastEditedTimeFilter
     | { readonly or: ReadonlyArray<PropertyFilter> }
     | { readonly and: ReadonlyArray<PropertyFilter> },
->(conditions: ReadonlyArray<T>): { readonly or: ReadonlyArray<T> } => ({
-  or: conditions,
-});
+>(conditions: ReadonlyArray<T>): { readonly or: ReadonlyArray<T> } {
+  return { or: conditions };
+}
 
-export const and = <
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#compound-filter-conditions
+ */
+export function and<
   T extends
     | PropertyFilter
     | TimestampCreatedTimeFilter
     | TimestampLastEditedTimeFilter
     | { readonly or: ReadonlyArray<PropertyFilter> }
     | { readonly and: ReadonlyArray<PropertyFilter> },
->(conditions: ReadonlyArray<T>): { readonly and: ReadonlyArray<T> } => ({
-  and: conditions,
-});
+>(conditions: ReadonlyArray<T>): { readonly and: ReadonlyArray<T> } {
+  return { and: conditions };
+}
 
-export const createdTime = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#timestamp
+ */
+export function createdTime(
   dateFilter: DatePropertyFilter,
-): TimestampCreatedTimeFilter => ({
-  created_time: dateFilter,
-  timestamp: "created_time",
-  type: "created_time",
-});
+): TimestampCreatedTimeFilter {
+  return {
+    created_time: dateFilter,
+    timestamp: "created_time",
+    type: "created_time",
+  };
+}
 
-export const lastEditedTime = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#timestamp
+ */
+export function lastEditedTime(
   dateFilter: DatePropertyFilter,
-): TimestampLastEditedTimeFilter => ({
-  last_edited_time: dateFilter,
-  timestamp: "last_edited_time",
-  type: "last_edited_time",
-});
+): TimestampLastEditedTimeFilter {
+  return {
+    last_edited_time: dateFilter,
+    timestamp: "last_edited_time",
+    type: "last_edited_time",
+  };
+}
 
-export const propertyTitle = (
+export function propertyTitle(
   property: string,
   textFilter: TextPropertyFilter,
-): PropertyFilter => ({
-  title: textFilter,
-  property,
-  type: "title",
-});
+): PropertyFilter {
+  return {
+    title: textFilter,
+    property,
+    type: "title",
+  };
+}
 
-export const propertyRichText = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#rich-text
+ */
+export function propertyRichText(
   property: string,
   textFilter: TextPropertyFilter,
-): PropertyFilter => ({
-  rich_text: textFilter,
-  property,
-  type: "rich_text",
-});
+): PropertyFilter {
+  return {
+    rich_text: textFilter,
+    property,
+    type: "rich_text",
+  };
+}
 
-export const propertyNumber = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#number
+ */
+export function propertyNumber(
   property: string,
   numberFilter: NumberPropertyFilter,
-): PropertyFilter => ({
-  number: numberFilter,
-  property,
-  type: "number",
-});
+): PropertyFilter {
+  return {
+    number: numberFilter,
+    property,
+    type: "number",
+  };
+}
 
-export const propertyCheckbox = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#checkbox
+ */
+export function propertyCheckbox(
   property: string,
   checkboxFilter: CheckboxPropertyFilter,
-): PropertyFilter => ({
-  checkbox: checkboxFilter,
-  property,
-  type: "checkbox",
-});
+): PropertyFilter {
+  return {
+    checkbox: checkboxFilter,
+    property,
+    type: "checkbox",
+  };
+}
 
-export const propertySelect = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#select
+ */
+export function propertySelect(
   property: string,
   selectFilter: SelectPropertyFilter,
-): PropertyFilter => ({
-  select: selectFilter,
-  property,
-  type: "select",
-});
+): PropertyFilter {
+  return {
+    select: selectFilter,
+    property,
+    type: "select",
+  };
+}
 
-export const propertyMultiSelect = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#multi-select
+ */
+export function propertyMultiSelect(
   property: string,
   multiSelectFilter: MultiSelectPropertyFilter,
-): PropertyFilter => ({
-  multi_select: multiSelectFilter,
-  property,
-  type: "multi_select",
-});
+): PropertyFilter {
+  return {
+    multi_select: multiSelectFilter,
+    property,
+    type: "multi_select",
+  };
+}
 
-export const propertyStatus = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#status
+ */
+export function propertyStatus(
   property: string,
   statusFilter: StatusPropertyFilter,
-): PropertyFilter => ({
-  status: statusFilter,
-  property,
-  type: "status",
-});
+): PropertyFilter {
+  return {
+    status: statusFilter,
+    property,
+    type: "status",
+  };
+}
 
-export const propertyDate = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#date
+ */
+export function propertyDate(
   property: string,
   dateFilter: DatePropertyFilter,
-): PropertyFilter => ({
-  date: dateFilter,
-  property,
-  type: "date",
-});
+): PropertyFilter {
+  return {
+    date: dateFilter,
+    property,
+    type: "date",
+  };
+}
 
-export const propertyPeople = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#people
+ */
+export function propertyPeople(
   property: string,
   peopleFilter: PeoplePropertyFilter,
-): PropertyFilter => ({
-  people: peopleFilter,
-  property,
-  type: "people",
-});
+): PropertyFilter {
+  return {
+    people: peopleFilter,
+    property,
+    type: "people",
+  };
+}
 
-export const propertyFiles = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#files
+ */
+export function propertyFiles(
   property: string,
   existenceFilter: ExistencePropertyFilter,
-): PropertyFilter => ({
-  files: existenceFilter,
-  property,
-  type: "files",
-});
+): PropertyFilter {
+  return {
+    files: existenceFilter,
+    property,
+    type: "files",
+  };
+}
 
-export const propertyUrl = (
+export function propertyUrl(
   property: string,
   textFilter: TextPropertyFilter,
-): PropertyFilter => ({
-  url: textFilter,
-  property,
-  type: "url",
-});
+): PropertyFilter {
+  return {
+    url: textFilter,
+    property,
+    type: "url",
+  };
+}
 
-export const propertyEmail = (
+export function propertyEmail(
   property: string,
   textFilter: TextPropertyFilter,
-): PropertyFilter => ({
-  email: textFilter,
-  property,
-  type: "email",
-});
+): PropertyFilter {
+  return {
+    email: textFilter,
+    property,
+    type: "email",
+  };
+}
 
-export const propertyPhoneNumber = (
+export function propertyPhoneNumber(
   property: string,
   textFilter: TextPropertyFilter,
-): PropertyFilter => ({
-  phone_number: textFilter,
-  property,
-  type: "phone_number",
-});
+): PropertyFilter {
+  return {
+    phone_number: textFilter,
+    property,
+    type: "phone_number",
+  };
+}
 
-export const propertyRelation = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#relation
+ */
+export function propertyRelation(
   property: string,
   relationFilter: RelationPropertyFilter,
-): PropertyFilter => ({
-  relation: relationFilter,
-  property,
-  type: "relation",
-});
+): PropertyFilter {
+  return {
+    relation: relationFilter,
+    property,
+    type: "relation",
+  };
+}
 
-export const propertyCreatedBy = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#people
+ */
+export function propertyCreatedBy(
   property: string,
   peopleFilter: PeoplePropertyFilter,
-): PropertyFilter => ({
-  created_by: peopleFilter,
-  property,
-  type: "created_by",
-});
+): PropertyFilter {
+  return {
+    created_by: peopleFilter,
+    property,
+    type: "created_by",
+  };
+}
 
-export const propertyCreatedTime = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#date
+ */
+export function propertyCreatedTime(
   property: string,
   dateFilter: DatePropertyFilter,
-): PropertyFilter => ({
-  created_time: dateFilter,
-  property,
-  type: "created_time",
-});
+): PropertyFilter {
+  return {
+    created_time: dateFilter,
+    property,
+    type: "created_time",
+  };
+}
 
-export const propertyLastEditedBy = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#people
+ */
+export function propertyLastEditedBy(
   property: string,
   peopleFilter: PeoplePropertyFilter,
-): PropertyFilter => ({
-  last_edited_by: peopleFilter,
-  property,
-  type: "last_edited_by",
-});
+): PropertyFilter {
+  return {
+    last_edited_by: peopleFilter,
+    property,
+    type: "last_edited_by",
+  };
+}
 
-export const propertyLastEditedTime = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#date
+ */
+export function propertyLastEditedTime(
   property: string,
   dateFilter: DatePropertyFilter,
-): PropertyFilter => ({
-  last_edited_time: dateFilter,
-  property,
-  type: "last_edited_time",
-});
+): PropertyFilter {
+  return {
+    last_edited_time: dateFilter,
+    property,
+    type: "last_edited_time",
+  };
+}
 
-export const propertyFormula = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#formula
+ */
+export function propertyFormula(
   property: string,
   formulaFilter: FormulaPropertyFilter,
-): PropertyFilter => ({
-  formula: formulaFilter,
-  property,
-  type: "formula",
-});
+): PropertyFilter {
+  return {
+    formula: formulaFilter,
+    property,
+    type: "formula",
+  };
+}
 
-export const propertyUniqueId = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#id
+ */
+export function propertyUniqueId(
   property: string,
   numberFilter: NumberPropertyFilter,
-): PropertyFilter => ({
-  unique_id: numberFilter,
-  property,
-  type: "unique_id",
-});
+): PropertyFilter {
+  return {
+    unique_id: numberFilter,
+    property,
+    type: "unique_id",
+  };
+}
 
-export const propertyRollup = (
+/**
+ * https://developers.notion.com/reference/post-database-query-filter#rollup
+ */
+export function propertyRollup(
   property: string,
   rollupFilter: RollupPropertyFilter,
-): PropertyFilter => ({
-  rollup: rollupFilter,
-  property,
-  type: "rollup",
-});
+): PropertyFilter {
+  return {
+    rollup: rollupFilter,
+    property,
+    type: "rollup",
+  };
+}

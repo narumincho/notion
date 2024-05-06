@@ -10,14 +10,14 @@ export * as filter from "./filter.ts";
 /**
  * Notion の ID から URL を生成する
  */
-export const idToNotionUrl = (id: PageId): URL => {
+export function idToNotionUrl(id: PageId): URL {
   return new URL(`https://notion.so/${id}`);
-};
+}
 
 /**
  * ページからタイトルを取得する
  */
-export const pickTitle = (page: Page): string => {
+export function pickTitle(page: Page): string {
   for (const property of page.properties.values()) {
     if (
       property.value.type === "richText" &&
@@ -27,23 +27,23 @@ export const pickTitle = (page: Page): string => {
     }
   }
   throw new Error("title not found");
-};
+}
 
 /**
  * リッチテキストをプレーンテキストに変換する
  */
-export const richTextToPlainText = (
+export function richTextToPlainText(
   richText: ReadonlyArray<RichTextItemResponse>,
-): string => {
+): string {
   return richText.map((text) => text.plainText).join("");
-};
+}
 
 /**
  * Notionのページのプロパティからテキストを取得する
  */
-export const propertyValueToString = (
+export function propertyValueToString(
   property: PropertyValue,
-): string => {
+): string {
   switch (property.type) {
     case "richText":
       return richTextToPlainText(property.richText);
@@ -69,4 +69,4 @@ export const propertyValueToString = (
     case "unsupported":
       return "";
   }
-};
+}

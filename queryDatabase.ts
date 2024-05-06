@@ -20,9 +20,10 @@ import type { DateResponse, RichTextItemResponse } from "./type.ts";
 
 /**
  * データベースから指定した条件を満たすページを複数取得する
- * @see https://developers.notion.com/reference/post-database-query
+ *
+ * https://developers.notion.com/reference/post-database-query
  */
-export const queryDatabase = async function* (parameter: {
+export async function* queryDatabase(parameter: {
   /**
    * https://www.notion.so/my-integrations で確認, 発行できる鍵
    * @example
@@ -111,7 +112,7 @@ export const queryDatabase = async function* (parameter: {
       return;
     }
   }
-};
+}
 
 type QueryDatabaseRawResponse = {
   readonly object: "error";
