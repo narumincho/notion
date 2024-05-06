@@ -1242,7 +1242,7 @@ export type Block = {
     readonly pageId: PageId;
   } | {
     readonly type: "blockId";
-    readonly blockId: string;
+    readonly blockId: BlockId;
   } | {
     readonly type: "workspace";
   };

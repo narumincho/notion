@@ -181,16 +181,17 @@ Deno.test("queryDatabase not found", async () => {
 });
 
 Deno.test("retrieveBlockChildren one", async () => {
+  const pageId = pageIdFrom("b0d037d8b54044dca71cd0350b5f3001");
   assertEquals(
     await Array.fromAsync(retrieveBlockChildren({
       apiKey,
-      blockId: pageIdFrom("b0d037d8b54044dca71cd0350b5f3001"),
+      blockId: pageId,
     })),
     [
       {
         content: {
           color: "default",
-          rich_text: [
+          richText: [
             {
               annotations: {
                 bold: false,
@@ -209,6 +210,10 @@ Deno.test("retrieveBlockChildren one", async () => {
           ],
           type: "paragraph",
         },
+        parent: {
+          type: "pageId",
+          pageId,
+        },
         createdByUserId: userIdFrom("b98a5d4e7d88422b8e58dcf58d45b7f0"),
         createdTime: new Date("2024-05-01T09:28:00.000Z"),
         hasChildren: false,
@@ -220,7 +225,7 @@ Deno.test("retrieveBlockChildren one", async () => {
       {
         content: {
           color: "default",
-          rich_text: [
+          richText: [
             {
               annotations: {
                 bold: false,
@@ -329,6 +334,10 @@ Deno.test("retrieveBlockChildren one", async () => {
           ],
           type: "paragraph",
         },
+        parent: {
+          type: "pageId",
+          pageId,
+        },
         createdByUserId: userIdFrom("b98a5d4e7d88422b8e58dcf58d45b7f0"),
         createdTime: new Date("2024-05-01T09:28:00.000Z"),
         hasChildren: false,
@@ -339,7 +348,33 @@ Deno.test("retrieveBlockChildren one", async () => {
       },
       {
         content: {
-          type: "unsupported",
+          color: "gray_background",
+          icon: {
+            emoji: "💡",
+            type: "emoji",
+          },
+          rich_text: [
+            {
+              annotations: {
+                bold: false,
+                code: false,
+                color: "default",
+                italic: false,
+                strikethrough: false,
+                underline: false,
+              },
+              content: {
+                type: "text",
+              },
+              href: undefined,
+              plainText: "別で取得しなきゃ無理だよね?",
+            },
+          ],
+          type: "callout",
+        },
+        parent: {
+          type: "pageId",
+          pageId,
         },
         createdByUserId: userIdFrom("b98a5d4e7d88422b8e58dcf58d45b7f0"),
         createdTime: new Date("2024-05-01T10:12:00.000Z"),
@@ -351,7 +386,15 @@ Deno.test("retrieveBlockChildren one", async () => {
       },
       {
         content: {
-          type: "unsupported",
+          type: "embed",
+          caption: [],
+          url: new URL(
+            "https://twitter.com/naru_mincho/status/1779839425968812093",
+          ),
+        },
+        parent: {
+          type: "pageId",
+          pageId,
         },
         createdByUserId: userIdFrom("b98a5d4e7d88422b8e58dcf58d45b7f0"),
         createdTime: new Date("2024-05-01T10:13:00.000Z"),
@@ -363,17 +406,52 @@ Deno.test("retrieveBlockChildren one", async () => {
       },
       {
         content: {
-          color: "default",
-          rich_text: [],
-          type: "paragraph",
+          type: "quote",
+          color: "red",
+          richText: [
+            {
+              annotations: {
+                bold: false,
+                code: false,
+                color: "default",
+                italic: false,
+                strikethrough: false,
+                underline: false,
+              },
+              content: {
+                type: "text",
+              },
+              href: undefined,
+              plainText: "aa ",
+            },
+            {
+              annotations: {
+                bold: false,
+                code: false,
+                color: "red",
+                italic: false,
+                strikethrough: false,
+                underline: false,
+              },
+              content: {
+                type: "text",
+              },
+              href: undefined,
+              plainText: "red",
+            },
+          ],
+        },
+        parent: {
+          type: "pageId",
+          pageId,
         },
         createdByUserId: userIdFrom("b98a5d4e7d88422b8e58dcf58d45b7f0"),
-        createdTime: new Date("2024-05-01T10:13:00.000Z"),
+        createdTime: new Date("2024-05-04T10:55:00.000Z"),
         hasChildren: false,
-        id: blockIdFrom("44fe83fd07844c86a229b0be1ba53510"),
+        id: blockIdFrom("d76aa3d5d6f44b99a0581a859c4f96e6"),
         inTrash: false,
         lastEditedByUserId: userIdFrom("b98a5d4e-7d88-422b-8e58-dcf58d45b7f0"),
-        lastEditedTime: new Date("2024-05-01T10:13:00.000Z"),
+        lastEditedTime: new Date("2024-05-04T10:55:00.000Z"),
       },
     ],
   );
