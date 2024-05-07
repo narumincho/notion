@@ -7,6 +7,7 @@ import type {
   MentionRichTextItemResponse,
   RichTextItemResponse,
 } from "./type.ts";
+import { createUrl } from "./url.ts";
 
 export const richTextItemResponseFromRaw = (
   raw: RawRichTextItemResponse,
@@ -16,7 +17,7 @@ export const richTextItemResponseFromRaw = (
       return {
         annotations: raw.annotations,
         plainText: raw.plain_text,
-        href: raw.href === null ? undefined : new URL(raw.href),
+        href: raw.href === null ? undefined : createUrl(raw.href),
         content: {
           type: "text",
         },
@@ -25,7 +26,7 @@ export const richTextItemResponseFromRaw = (
       return {
         annotations: raw.annotations,
         plainText: raw.plain_text,
-        href: raw.href === null ? undefined : new URL(raw.href),
+        href: raw.href === null ? undefined : createUrl(raw.href),
         content: {
           type: "mention",
           mention: mentionRichTextItemResponseFromRaw(raw.mention),
@@ -35,7 +36,7 @@ export const richTextItemResponseFromRaw = (
       return {
         annotations: raw.annotations,
         plainText: raw.plain_text,
-        href: raw.href === null ? undefined : new URL(raw.href),
+        href: raw.href === null ? undefined : createUrl(raw.href),
         content: {
           type: "equation",
           equation: raw.equation.expression,
