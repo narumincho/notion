@@ -20,11 +20,7 @@ import type {
   RichTextItemResponse,
 } from "./type.ts";
 
-/**
- * ページに含まれるブロックもしくは, ブロックの子ブロックを取得する
- * https://developers.notion.com/reference/get-block-children
- */
-export async function* retrieveBlockChildren(parameter: {
+export type RetrieveBlockChildrenParameter = {
   /**
    * https://www.notion.so/my-integrations で確認, 発行できる鍵
    * @example
@@ -47,7 +43,7 @@ export async function* retrieveBlockChildren(parameter: {
    *
    * @throws {Error} ページもしくはブロックが見つからない場合
    */
-  readonly blockId: PageId;
+  readonly blockId: PageId | BlockId;
 
   /**
    * 1回のHTTPリクエストで取得するページの最大数 (最大100)
@@ -56,7 +52,15 @@ export async function* retrieveBlockChildren(parameter: {
    * @default 100
    */
   readonly pageSize?: number | undefined;
-}): AsyncGenerator<Block, void, unknown> {
+};
+
+/**
+ * ページに含まれるブロックもしくは, ブロックの子ブロックを取得する
+ * https://developers.notion.com/reference/get-block-children
+ */
+export async function* retrieveBlockChildren(
+  parameter: RetrieveBlockChildrenParameter,
+): AsyncGenerator<Block, void, unknown> {
   let cursor: string | undefined = undefined;
   while (true) {
     const url = new URL(
@@ -232,7 +236,6 @@ type RawHeading2BlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -255,7 +258,6 @@ type RawHeading3BlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -277,7 +279,6 @@ type RawBulletedListItemBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -299,7 +300,6 @@ type RawNumberedListItemBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -318,7 +318,6 @@ type RawQuoteBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -341,7 +340,6 @@ type RawToDoBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -363,7 +361,6 @@ type RawToggleBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -382,7 +379,6 @@ type RawTemplateBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -403,7 +399,6 @@ type RawSyncedBlockBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -422,7 +417,6 @@ type RawChildPageBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -441,7 +435,6 @@ type RawChildDatabaseBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -460,7 +453,6 @@ type RawEquationBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -483,7 +475,6 @@ type RawCodeBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -510,7 +501,6 @@ type RawCalloutBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -529,7 +519,6 @@ export type RawDividerBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -548,7 +537,6 @@ export type RawBreadcrumbBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
@@ -567,11 +555,10 @@ export type RawTableOfContentsBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawColumnListBlockObjectResponse = {
+type RawColumnListBlockObjectResponse = {
   type: "column_list";
   column_list: Record<string, never>;
   parent:
@@ -586,11 +573,10 @@ export type RawColumnListBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawColumnBlockObjectResponse = {
+type RawColumnBlockObjectResponse = {
   type: "column";
   column: Record<string, never>;
   parent:
@@ -605,11 +591,10 @@ export type RawColumnBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawLinkToPageBlockObjectResponse = {
+type RawLinkToPageBlockObjectResponse = {
   type: "link_to_page";
   link_to_page:
     | { type: "page_id"; page_id: string }
@@ -627,11 +612,10 @@ export type RawLinkToPageBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawTableBlockObjectResponse = {
+type RawTableBlockObjectResponse = {
   type: "table";
   table: {
     has_column_header: boolean;
@@ -650,11 +634,10 @@ export type RawTableBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawTableRowBlockObjectResponse = {
+type RawTableRowBlockObjectResponse = {
   type: "table_row";
   table_row: { cells: Array<ReadonlyArray<RawRichTextItemResponse>> };
   parent:
@@ -669,11 +652,10 @@ export type RawTableRowBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawEmbedBlockObjectResponse = {
+type RawEmbedBlockObjectResponse = {
   type: "embed";
   embed: { url: string; caption: ReadonlyArray<RawRichTextItemResponse> };
   parent:
@@ -688,11 +670,10 @@ export type RawEmbedBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawBookmarkBlockObjectResponse = {
+type RawBookmarkBlockObjectResponse = {
   type: "bookmark";
   bookmark: { url: string; caption: ReadonlyArray<RawRichTextItemResponse> };
   parent:
@@ -707,11 +688,10 @@ export type RawBookmarkBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawImageBlockObjectResponse = {
+type RawImageBlockObjectResponse = {
   type: "image";
   image:
     | {
@@ -736,11 +716,10 @@ export type RawImageBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawVideoBlockObjectResponse = {
+type RawVideoBlockObjectResponse = {
   type: "video";
   video:
     | {
@@ -765,11 +744,10 @@ export type RawVideoBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawPdfBlockObjectResponse = {
+type RawPdfBlockObjectResponse = {
   type: "pdf";
   pdf:
     | {
@@ -794,11 +772,10 @@ export type RawPdfBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawFileBlockObjectResponse = {
+type RawFileBlockObjectResponse = {
   type: "file";
   file:
     | {
@@ -825,11 +802,10 @@ export type RawFileBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawAudioBlockObjectResponse = {
+type RawAudioBlockObjectResponse = {
   type: "audio";
   audio:
     | {
@@ -854,11 +830,10 @@ export type RawAudioBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawLinkPreviewBlockObjectResponse = {
+type RawLinkPreviewBlockObjectResponse = {
   type: "link_preview";
   link_preview: { url: string };
   parent:
@@ -873,11 +848,10 @@ export type RawLinkPreviewBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 
-export type RawUnsupportedBlockObjectResponse = {
+type RawUnsupportedBlockObjectResponse = {
   type: "unsupported";
   unsupported: Record<string, unknown>;
   parent:
@@ -892,7 +866,6 @@ export type RawUnsupportedBlockObjectResponse = {
   last_edited_time: string;
   last_edited_by: PartialUserObjectResponse;
   has_children: boolean;
-  archived: boolean;
   in_trash: boolean;
 };
 

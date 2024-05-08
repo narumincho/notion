@@ -5,6 +5,7 @@ import type { RichTextItemResponse } from "./type.ts";
 export * from "./id.ts";
 export * from "./queryDatabase.ts";
 export * from "./retrieveBlockChildren.ts";
+export * from "./updatePageProperties.ts";
 export * from "./type.ts";
 export * as filter from "./filter.ts";
 

@@ -3895,3 +3895,15 @@ export type LanguageRequest =
   | "xml"
   | "yaml"
   | "java/c/c++/c#";
+
+export type SelectColor =
+  | "default"
+  | "gray"
+  | "brown"
+  | "orange"
+  | "yellow"
+  | "green"
+  | "blue"
+  | "purple"
+  | "pink"
+  | "red";

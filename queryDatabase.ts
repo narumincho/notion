@@ -16,7 +16,11 @@ import type {
   RawDateResponse,
   RawRichTextItemResponse,
 } from "./rawType.ts";
-import type { DateResponse, RichTextItemResponse } from "./type.ts";
+import type {
+  DateResponse,
+  RichTextItemResponse,
+  SelectColor,
+} from "./type.ts";
 
 /**
  * データベースから指定した条件を満たすページを複数取得する
@@ -339,18 +343,6 @@ type PartialSelectResponse = {
   readonly color: SelectColor;
   readonly name: string;
 };
-
-export type SelectColor =
-  | "default"
-  | "gray"
-  | "brown"
-  | "orange"
-  | "yellow"
-  | "green"
-  | "blue"
-  | "purple"
-  | "pink"
-  | "red";
 
 export type Page = {
   readonly id: PageId;
