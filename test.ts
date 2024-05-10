@@ -159,6 +159,17 @@ Deno.test("queryDatabase one", async () => {
           },
         },
       ],
+      [
+        propertyIdFrom("Yxvy"),
+        {
+          name: "URL",
+          value: {
+            type: "url",
+            url: undefined,
+            rawUrl: "不正なURL",
+          },
+        },
+      ],
     ]),
   );
 });

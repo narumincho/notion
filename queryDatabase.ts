@@ -371,6 +371,10 @@ export type PropertyValue =
      */
     readonly type: "url";
     readonly url: URL | undefined;
+    /**
+     * Because it is possible to set an incorrect URL, the raw URL is also provided.
+     */
+    readonly rawUrl: string | undefined;
   }
   | {
     /**
@@ -451,8 +455,12 @@ const rawPropertyValueToPropertyValue = (
       return { type: "number", number: raw.number ?? undefined };
     case "url":
       return raw.url === null
-        ? { type: "url", url: undefined }
-        : { type: "url", url: new URL(raw.url) };
+        ? { type: "url", url: undefined, rawUrl: raw.url ?? undefined }
+        : {
+          type: "url",
+          url: URL.parse(raw.url) ?? undefined,
+          rawUrl: raw.url,
+        };
     case "select":
       return {
         type: "select",
