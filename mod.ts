@@ -8,6 +8,7 @@ export * from "./retrieveBlockChildren.ts";
 export * from "./updatePageProperties.ts";
 export * from "./type.ts";
 export * as filter from "./filter.ts";
+export * as property from "./property.ts";
 
 /**
  * Notion の ID から URL を生成する
