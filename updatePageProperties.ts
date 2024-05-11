@@ -82,7 +82,12 @@ export async function updatePageProperties(
       }),
     },
   );
-  console.log(response);
+  if (!response.ok) {
+    throw new Error(
+      `Failed to update page properties: ${response.status} ${await response
+        .text()}`,
+    );
+  }
   const json: RawPage = await response.json();
   return rawPageToPage(json);
 }
