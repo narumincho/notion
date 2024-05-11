@@ -14,6 +14,7 @@ import type {
 import type {
   MentionRichTextItemResponse,
   Page,
+  Property,
   PropertyValue,
   RichTextItemResponse,
 } from "./type.ts";
@@ -97,14 +98,13 @@ export function rawPageToPage(page: RawPage): Page {
     createdByUserId: userIdFrom(page.created_by.id),
     lastEditedByUserId: userIdFrom(page.last_edited_by.id),
     inTrash: page.in_trash,
-    properties: new Map(
-      Object.entries(page.properties).map((
-        [key, value],
-      ) => [propertyIdFrom(value.id), {
-        name: key,
-        value: rawPropertyValueToPropertyValue(value),
-      }]),
-    ),
+    properties: Object.entries(page.properties).map((
+      [key, value],
+    ): Property => ({
+      id: propertyIdFrom(value.id),
+      name: key,
+      value: rawPropertyValueToPropertyValue(value),
+    })),
   };
 }
 

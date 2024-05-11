@@ -3915,11 +3915,28 @@ export type Page = {
   readonly createdByUserId: UserId;
   readonly lastEditedByUserId: UserId;
   readonly inTrash: boolean;
-  readonly properties: ReadonlyMap<PropertyId, {
-    readonly name: string;
-    readonly value: PropertyValue;
-  }>;
+  readonly properties: ReadonlyArray<Property>;
 };
+
+export type Property = {
+  readonly id: PropertyId;
+  readonly name: string;
+  readonly value: PropertyValue;
+};
+
+export function getPropertyValueById(
+  properties: ReadonlyArray<Property>,
+  propertyId: PropertyId,
+): PropertyValue | undefined {
+  return properties.find((property) => property.id === propertyId)?.value;
+}
+
+export function getPropertyValueByName(
+  properties: ReadonlyArray<Property>,
+  propertyName: string,
+): PropertyValue | undefined {
+  return properties.find((property) => property.name === propertyName)?.value;
+}
 
 export type PropertyValue =
   | {
