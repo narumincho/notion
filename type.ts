@@ -1,5 +1,10 @@
 import type { DatabaseId, PageId, PropertyId, SelectId, UserId } from "./id.ts";
 
+/**
+ * @module
+ * Notion API の型を TypeScript で扱いやすい形式に変更したもの
+ */
+
 export type TemplateMentionResponse =
   | TemplateMentionDateTemplateMentionResponse
   | TemplateMentionUserTemplateMentionResponse;

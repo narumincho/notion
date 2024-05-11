@@ -4,6 +4,11 @@ import type {
   TemplateMentionResponse,
 } from "./type.ts";
 
+/**
+ * @module
+ * Notion API の型を そのままTypeScriptの型として定義したもの
+ */
+
 export type RawRichTextItemResponse =
   | RawTextRichTextItemResponse
   | RawMentionRichTextItemResponse
