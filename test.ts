@@ -366,7 +366,7 @@ Deno.test("retrieveBlockChildren one", async () => {
             emoji: "💡",
             type: "emoji",
           },
-          rich_text: [
+          richText: [
             {
               annotations: {
                 bold: false,
