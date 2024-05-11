@@ -1,11 +1,13 @@
 import {
   filter,
   pageIdFrom,
+  property,
   type PropertyId,
   propertyIdFrom,
   type PropertyValue,
   queryDatabase,
   selectIdFrom,
+  updatePageProperties,
   userIdFrom,
 } from "./mod.ts";
 import { assertEquals, assertRejects } from "jsr:@std/assert";
@@ -165,6 +167,7 @@ Deno.test("queryDatabase one", async () => {
           name: "URL",
           value: {
             type: "url",
+            urlType: "invalid",
             url: undefined,
             rawUrl: "不正なURL",
           },
@@ -466,4 +469,42 @@ Deno.test("retrieveBlockChildren one", async () => {
       },
     ],
   );
+});
+
+Deno.test("updatePageProperties", async () => {
+  const pageId = pageIdFrom("6a4e6099317f4803bf412c9899bade8c");
+  const pageA = await updatePageProperties({
+    apiKey,
+    pageId,
+    properties: {
+      "URL": property.url(new URL("https://example.com")),
+    },
+  });
+  assertEquals(pageA.id, pageId);
+  assertEquals(pageA.properties.get(propertyIdFrom("Yxvy")), {
+    name: "URL",
+    value: {
+      type: "url",
+      urlType: "valid",
+      url: new URL("https://example.com"),
+      rawUrl: "https://example.com/",
+    },
+  });
+  const pageB = await updatePageProperties({
+    apiKey,
+    pageId,
+    properties: {
+      "URL": property.url(new URL("https://narumincho.com")),
+    },
+  });
+  assertEquals(pageB.id, pageId);
+  assertEquals(pageB.properties.get(propertyIdFrom("Yxvy")), {
+    name: "URL",
+    value: {
+      type: "url",
+      urlType: "valid",
+      url: new URL("https://narumincho.com"),
+      rawUrl: "https://narumincho.com/",
+    },
+  });
 });

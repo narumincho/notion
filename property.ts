@@ -264,6 +264,6 @@ export type UrlUpdate = {
 /**
  * https://developers.notion.com/reference/page-property-values#url
  */
-export function url(url: string | undefined): UrlUpdate {
-  return { type: "url", url: url ?? null };
+export function url(url: URL | undefined): UrlUpdate {
+  return { type: "url", url: url?.toString() ?? null };
 }

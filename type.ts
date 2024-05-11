@@ -1,4 +1,4 @@
-import type { DatabaseId, PageId, UserId } from "./id.ts";
+import type { DatabaseId, PageId, PropertyId, SelectId, UserId } from "./id.ts";
 
 export type TemplateMentionResponse =
   | TemplateMentionDateTemplateMentionResponse
@@ -3907,3 +3907,131 @@ export type SelectColor =
   | "purple"
   | "pink"
   | "red";
+
+export type Page = {
+  readonly id: PageId;
+  readonly createdTime: Date;
+  readonly lastEditedTime: Date;
+  readonly createdByUserId: UserId;
+  readonly lastEditedByUserId: UserId;
+  readonly inTrash: boolean;
+  readonly properties: ReadonlyMap<PropertyId, {
+    readonly name: string;
+    readonly value: PropertyValue;
+  }>;
+};
+
+export type PropertyValue =
+  | {
+    /**
+     * https://developers.notion.com/reference/page-property-values#number
+     */
+    readonly type: "number";
+    readonly number: number | undefined;
+  }
+  | URLResponse
+  | {
+    /**
+     * - select https://developers.notion.com/reference/page-property-values#select
+     * - multi_select https://developers.notion.com/reference/page-property-values#multi-select
+     * - status https://developers.notion.com/reference/page-property-values#status
+     */
+    readonly type: "select";
+    readonly select: Array<SelectResponse>;
+    readonly selectType: "select" | "multiSelect" | "status";
+  }
+  | {
+    /**
+     * https://developers.notion.com/reference/page-property-values#date
+     */
+    readonly type: "date";
+    readonly date: DateResponse | undefined;
+  }
+  | {
+    /**
+     * https://developers.notion.com/reference/page-property-values#email
+     */
+    readonly type: "email";
+    readonly email: string | undefined;
+  }
+  | {
+    /**
+     * https://developers.notion.com/reference/page-property-values#phone-number
+     */
+    readonly type: "phoneNumber";
+    readonly phoneNumber: string | undefined;
+  }
+  | {
+    /**
+     * https://developers.notion.com/reference/page-property-values#checkbox
+     */
+    readonly type: "checkbox";
+    readonly checkbox: boolean;
+  }
+  | {
+    /**
+     * - title https://developers.notion.com/reference/page-property-values#title
+     * - rich_text https://developers.notion.com/reference/page-property-values#rich-text
+     */
+    readonly type: "richText";
+    readonly richText: Array<RichTextItemResponse>;
+    readonly richTextType: "title" | "richText";
+  }
+  | {
+    /**
+     * https://developers.notion.com/reference/page-property-values#relation
+     */
+    readonly type: "relation";
+    /**
+     * An array of related page references. A page reference is an object with an id key and a string value corresponding to a page ID in another database.
+     *
+     * 画面上で決めた順番通りに取得されます
+     */
+    readonly ids: ReadonlyArray<PageId>;
+    /**
+     * If a relation has more than 25 references, then the has_more value for the relation in the response object is true. If a relation doesn’t exceed the limit, then has_more is false.
+     */
+    readonly hasMore: boolean;
+  }
+  | { readonly type: "unsupported" };
+
+export type SelectResponse = {
+  readonly id: SelectId;
+  readonly name: string;
+  readonly color: SelectColor;
+};
+
+export type URLResponse = {
+  /**
+   * https://developers.notion.com/reference/page-property-values#url
+   */
+  readonly type: "url";
+  readonly urlType: "valid";
+  readonly url: URL;
+  /**
+   * Because it is possible to set an incorrect URL, the raw URL is also provided.
+   */
+  readonly rawUrl: string;
+} | {
+  /**
+   * https://developers.notion.com/reference/page-property-values#url
+   */
+  readonly type: "url";
+  readonly urlType: "invalid";
+  readonly url: undefined;
+  /**
+   * Because it is possible to set an incorrect URL, the raw URL is also provided.
+   */
+  readonly rawUrl: string;
+} | {
+  /**
+   * https://developers.notion.com/reference/page-property-values#url
+   */
+  readonly type: "url";
+  readonly urlType: "empty";
+  readonly url: undefined;
+  /**
+   * Because it is possible to set an incorrect URL, the raw URL is also provided.
+   */
+  readonly rawUrl: undefined;
+};
