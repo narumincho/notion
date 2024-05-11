@@ -1,16 +1,19 @@
 import {
   filter,
+  getPropertyValueById,
   pageIdFrom,
   property,
-  type PropertyId,
   propertyIdFrom,
-  type PropertyValue,
   queryDatabase,
   selectIdFrom,
   updatePageProperties,
   userIdFrom,
 } from "./mod.ts";
-import { assertEquals, assertRejects } from "jsr:@std/assert";
+import {
+  assertArrayIncludes,
+  assertEquals,
+  assertRejects,
+} from "jsr:@std/assert";
 import secret from "./secret.json" with { type: "json" };
 import { blockIdFrom, databaseIdFrom } from "./id.ts";
 import { retrieveBlockChildren } from "./retrieveBlockChildren.ts";
@@ -45,137 +48,133 @@ Deno.test("queryDatabase one", async () => {
     new Date("2024-04-27T12:18:00.000Z"),
   );
   assertEquals(firstPage.inTrash, false);
-  assertEquals(
+  expectArrayEquivalence(
     firstPage.properties,
-    new Map<PropertyId, {
-      readonly name: string;
-      readonly value: PropertyValue;
-    }>([
-      [
-        propertyIdFrom("title"),
-        {
-          name: "名前",
-          value: {
-            type: "richText",
-            richTextType: "title",
-            richText: [
-              {
-                annotations: {
-                  bold: false,
-                  code: false,
-                  color: "default",
-                  italic: false,
-                  strikethrough: false,
-                  underline: false,
-                },
-                href: undefined,
-                plainText: "A ",
-                content: {
-                  type: "text",
-                },
-              },
-              {
-                annotations: {
-                  bold: false,
-                  code: false,
-                  color: "default",
-                  italic: false,
-                  strikethrough: false,
-                  underline: false,
-                },
-                content: {
-                  type: "mention",
-                  mention: {
-                    type: "user",
-                    userId: userIdFrom(
-                      "b98a5d4e7d88422b8e58dcf58d45b7f0",
-                    ),
-                  },
-                },
-                href: undefined,
-                plainText: "@Anonymous",
-              },
-            ],
-          },
-        },
-      ],
-      [
-        propertyIdFrom("ycLe"),
-        {
-          name: "タグ",
-          value: {
-            type: "select",
-            select: [
-              {
-                id: selectIdFrom("392f963c2cc44009a24121b704c04042"),
-                name: "あ",
-                color: "green",
-              },
-            ],
-            selectType: "multiSelect",
-          },
-        },
-      ],
-      [
-        propertyIdFrom("BjF%5D"),
-        {
-          name: "日付",
-          value: {
-            type: "date",
-            date: {
-              start: new Date("2024-04-29T03:00:00.000Z"),
-              end: undefined,
-            },
-          },
-        },
-      ],
-      [
-        propertyIdFrom("ZX%3CB"),
-        {
-          name: "ステータス",
-          value: {
-            type: "select",
-            select: [
-              {
-                id: selectIdFrom("adde31eb4432411d846c43059dad2f58"),
-                name: "未着手",
+    [
+      {
+        id: propertyIdFrom("title"),
+        name: "名前",
+        value: {
+          type: "richText",
+          richTextType: "title",
+          richText: [
+            {
+              annotations: {
+                bold: false,
+                code: false,
                 color: "default",
+                italic: false,
+                strikethrough: false,
+                underline: false,
               },
-            ],
-            selectType: "status",
+              href: undefined,
+              plainText: "A ",
+              content: {
+                type: "text",
+              },
+            },
+            {
+              annotations: {
+                bold: false,
+                code: false,
+                color: "default",
+                italic: false,
+                strikethrough: false,
+                underline: false,
+              },
+              content: {
+                type: "mention",
+                mention: {
+                  type: "user",
+                  userId: userIdFrom(
+                    "b98a5d4e7d88422b8e58dcf58d45b7f0",
+                  ),
+                },
+              },
+              href: undefined,
+              plainText: "@Anonymous",
+            },
+          ],
+        },
+      },
+
+      {
+        id: propertyIdFrom("ycLe"),
+        name: "タグ",
+        value: {
+          type: "select",
+          select: [
+            {
+              id: selectIdFrom("392f963c2cc44009a24121b704c04042"),
+              name: "あ",
+              color: "green",
+            },
+          ],
+          selectType: "multiSelect",
+        },
+      },
+
+      {
+        id: propertyIdFrom("BjF%5D"),
+        name: "日付",
+        value: {
+          type: "date",
+          date: {
+            start: new Date("2024-04-29T03:00:00.000Z"),
+            end: undefined,
           },
         },
-      ],
-      [
-        propertyIdFrom("%3AY%5C%5D"),
-        {
-          name: "データベーステストとのリレーション",
-          value: {
-            type: "relation",
-            hasMore: false,
-            ids: [
-              pageIdFrom("0538d3d5058a484bb4db1a911fffaec9"),
-              pageIdFrom("e3389b1b7e7841c9835155b8f4757dbe"),
-              pageIdFrom("6a4e6099317f4803bf412c9899bade8c"),
-            ],
-          },
+      },
+      {
+        id: propertyIdFrom("ZX%3CB"),
+        name: "ステータス",
+        value: {
+          type: "select",
+          select: [
+            {
+              id: selectIdFrom("adde31eb4432411d846c43059dad2f58"),
+              name: "未着手",
+              color: "default",
+            },
+          ],
+          selectType: "status",
         },
-      ],
-      [
-        propertyIdFrom("Yxvy"),
-        {
-          name: "URL",
-          value: {
-            type: "url",
-            urlType: "invalid",
-            url: undefined,
-            rawUrl: "不正なURL",
-          },
+      },
+
+      {
+        id: propertyIdFrom("%3AY%5C%5D"),
+        name: "データベーステストとのリレーション",
+        value: {
+          type: "relation",
+          hasMore: false,
+          ids: [
+            pageIdFrom("0538d3d5058a484bb4db1a911fffaec9"),
+            pageIdFrom("e3389b1b7e7841c9835155b8f4757dbe"),
+            pageIdFrom("6a4e6099317f4803bf412c9899bade8c"),
+          ],
         },
-      ],
-    ]),
+      },
+      {
+        id: propertyIdFrom("Yxvy"),
+        name: "URL",
+        value: {
+          type: "url",
+          urlType: "invalid",
+          url: undefined,
+          rawUrl: "不正なURL",
+        },
+      },
+    ],
   );
 });
+
+const expectArrayEquivalence = <T>(
+  actual: ReadonlyArray<T>,
+  expected: ReadonlyArray<T>,
+) => {
+  assertArrayIncludes(actual, expected);
+  assertArrayIncludes(expected, actual);
+};
 
 Deno.test("queryDatabase not found", async () => {
   await assertRejects(
@@ -367,7 +366,7 @@ Deno.test("retrieveBlockChildren one", async () => {
             emoji: "💡",
             type: "emoji",
           },
-          rich_text: [
+          richText: [
             {
               annotations: {
                 bold: false,
@@ -481,15 +480,15 @@ Deno.test("updatePageProperties", async () => {
     },
   });
   assertEquals(pageA.id, pageId);
-  assertEquals(pageA.properties.get(propertyIdFrom("Yxvy")), {
-    name: "URL",
-    value: {
+  assertEquals(
+    getPropertyValueById(pageA.properties, propertyIdFrom("Yxvy")),
+    {
       type: "url",
       urlType: "valid",
       url: new URL("https://example.com"),
       rawUrl: "https://example.com/",
     },
-  });
+  );
   const pageB = await updatePageProperties({
     apiKey,
     pageId,
@@ -498,13 +497,10 @@ Deno.test("updatePageProperties", async () => {
     },
   });
   assertEquals(pageB.id, pageId);
-  assertEquals(pageB.properties.get(propertyIdFrom("Yxvy")), {
-    name: "URL",
-    value: {
-      type: "url",
-      urlType: "valid",
-      url: new URL("https://narumincho.com"),
-      rawUrl: "https://narumincho.com/",
-    },
+  assertEquals(getPropertyValueById(pageB.properties, propertyIdFrom("Yxvy")), {
+    type: "url",
+    urlType: "valid",
+    url: new URL("https://narumincho.com"),
+    rawUrl: "https://narumincho.com/",
   });
 });

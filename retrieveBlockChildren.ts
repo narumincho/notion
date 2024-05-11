@@ -931,20 +931,20 @@ const rawBlockToBlockContent = (rawBlock: RawBlock): BlockContent => {
     case "to_do":
       return {
         type: "toDo",
-        rich_text: rawBlock.to_do.rich_text.map(richTextItemResponseFromRaw),
+        richText: rawBlock.to_do.rich_text.map(richTextItemResponseFromRaw),
         color: rawBlock.to_do.color,
         checked: rawBlock.to_do.checked,
       };
     case "toggle":
       return {
         type: "toggle",
-        rich_text: rawBlock.toggle.rich_text.map(richTextItemResponseFromRaw),
+        richText: rawBlock.toggle.rich_text.map(richTextItemResponseFromRaw),
         color: rawBlock.toggle.color,
       };
     case "template":
       return {
         type: "template",
-        rich_text: rawBlock.template.rich_text.map(richTextItemResponseFromRaw),
+        richText: rawBlock.template.rich_text.map(richTextItemResponseFromRaw),
       };
     case "synced_block":
       return {
@@ -973,14 +973,14 @@ const rawBlockToBlockContent = (rawBlock: RawBlock): BlockContent => {
     case "code":
       return {
         type: "code",
-        rich_text: rawBlock.code.rich_text.map(richTextItemResponseFromRaw),
+        richText: rawBlock.code.rich_text.map(richTextItemResponseFromRaw),
         caption: rawBlock.code.caption.map(richTextItemResponseFromRaw),
         language: rawBlock.code.language,
       };
     case "callout":
       return {
         type: "callout",
-        rich_text: rawBlock.callout.rich_text.map(richTextItemResponseFromRaw),
+        richText: rawBlock.callout.rich_text.map(richTextItemResponseFromRaw),
         color: rawBlock.callout.color,
         icon: (() => {
           switch (rawBlock.callout.icon?.type) {
@@ -1328,7 +1328,7 @@ export type Quote = {
  */
 export type ToDo = {
   readonly type: "toDo";
-  readonly rich_text: ReadonlyArray<RichTextItemResponse>;
+  readonly richText: ReadonlyArray<RichTextItemResponse>;
   readonly color: ApiColor;
   readonly checked: boolean;
 };
@@ -1338,7 +1338,7 @@ export type ToDo = {
  */
 export type Toggle = {
   readonly type: "toggle";
-  readonly rich_text: ReadonlyArray<RichTextItemResponse>;
+  readonly richText: ReadonlyArray<RichTextItemResponse>;
   readonly color: ApiColor;
 };
 
@@ -1348,7 +1348,7 @@ export type Toggle = {
  */
 export type Template = {
   readonly type: "template";
-  readonly rich_text: ReadonlyArray<RichTextItemResponse>;
+  readonly richText: ReadonlyArray<RichTextItemResponse>;
 };
 
 /**
@@ -1390,7 +1390,7 @@ export type Equation = {
  */
 export type Code = {
   readonly type: "code";
-  readonly rich_text: ReadonlyArray<RichTextItemResponse>;
+  readonly richText: ReadonlyArray<RichTextItemResponse>;
   readonly caption: ReadonlyArray<RichTextItemResponse>;
   readonly language: LanguageRequest;
 };
@@ -1400,7 +1400,7 @@ export type Code = {
  */
 export type Callout = {
   readonly type: "callout";
-  readonly rich_text: ReadonlyArray<RichTextItemResponse>;
+  readonly richText: ReadonlyArray<RichTextItemResponse>;
   readonly color: ApiColor;
   readonly icon:
     | { readonly type: "emoji"; readonly emoji: EmojiRequest }
