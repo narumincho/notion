@@ -40,8 +40,6 @@ export type RetrieveBlockChildrenParameter = {
    *
    * @example
    * "39aaf5dc888847dbbf3b671067cf3816"
-   *
-   * @throws {Error} ページもしくはブロックが見つからない場合
    */
   readonly blockId: PageId | BlockId;
 
@@ -57,6 +55,8 @@ export type RetrieveBlockChildrenParameter = {
 /**
  * ページに含まれるブロックもしくは, ブロックの子ブロックを取得する
  * https://developers.notion.com/reference/get-block-children
+ *
+ * @throws {Error} ページもしくはブロックが見つからない場合
  */
 export async function* retrieveBlockChildren(
   parameter: RetrieveBlockChildrenParameter,
@@ -87,7 +87,6 @@ export async function* retrieveBlockChildren(
         `Notion API error: ${response.code} ${response.message}`,
       );
     }
-    console.log(response);
     for (const block of response.results) {
       yield {
         id: blockIdFrom(block.id),
@@ -1536,10 +1535,23 @@ export type Pdf = {
  * https://developers.notion.com/reference/block#file
  */
 export type File = {
+  /**
+   * Notion-hosted files
+   */
   readonly type: "file";
   readonly file: FileObject;
   readonly caption: ReadonlyArray<RichTextItemResponse>;
   readonly name: string;
+} | {
+  /**
+   * An external file is any URL linked to in Notion that isn’t hosted by Notion.
+   */
+  readonly type: "external";
+  /**
+   * A link to the externally hosted content.
+   * @example new URL("https://website.domain/files/doc.txt")
+   */
+  readonly url: URL;
 };
 
 export type Audio = {

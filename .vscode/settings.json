@@ -1,6 +1,7 @@
 {
   "deno.enable": true,
   "editor.formatOnSave": true,
+  "editor.tabSize": 2,
   "[json]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },

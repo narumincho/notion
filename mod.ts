@@ -1,6 +1,7 @@
 import type { PageId } from "./id.ts";
 import type { Page, PropertyValue, RichTextItemResponse } from "./type.ts";
 
+export * from "./createPageInDatabase.ts";
 export * from "./id.ts";
 export * from "./queryDatabase.ts";
 export * from "./retrieveBlockChildren.ts";

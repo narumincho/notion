@@ -42,7 +42,7 @@ export type UpdatePagePropertiesParameter = {
   /**
    * A page icon for the page.
    */
-  readonly icon?: PageIconUpdate | undefined;
+  readonly icon?: PageIcon | undefined;
 
   /**
    * A cover for the page.
@@ -73,7 +73,7 @@ export async function updatePageProperties(
       body: JSON.stringify({
         properties: parameter.properties,
         ...(parameter.icon
-          ? { icon: pageIconUpdateToRequestJson(parameter.icon) }
+          ? { icon: pageIconToRequestJson(parameter.icon) }
           : {}),
         ...(parameter.cover
           ? { cover: pageCoverUpdateToRequestJson(parameter.cover) }
@@ -115,7 +115,7 @@ function pageCoverUpdateToRequestJson(
   }
 }
 
-export type PageIconUpdate = {
+export type PageIcon = {
   readonly type: "emoji";
   readonly emoji: EmojiRequest;
 } | {
@@ -125,8 +125,8 @@ export type PageIconUpdate = {
   readonly type: "none";
 };
 
-function pageIconUpdateToRequestJson(
-  pageIconUpdate: PageIconUpdate,
+export function pageIconToRequestJson(
+  pageIconUpdate: PageIcon,
 ):
   | { readonly emoji: string; readonly type: "emoji" }
   | { readonly external: { readonly url: string }; readonly type: "external" }
